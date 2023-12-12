@@ -40,7 +40,16 @@ versionInfo: GameID
 	}
 ;
 
-startRoom: Room 'Void' "This is a featureless void.";
-+me: Person;
+startRoom: Room 'Void'
+	"This is a featureless void.  There's another room to the north. "
+	north = northRoom
+;
++pebble: Thing 'small round pebble' 'pebble' "A small, round pebble. ";
++me: MemoryEngineActor;
+
+northRoom: Room 'North Room'
+	"This is the north room.  The void is to the south. "
+	south = startRoom
+;
 
 gameMain: GameMainDef initialPlayerChar = me;
