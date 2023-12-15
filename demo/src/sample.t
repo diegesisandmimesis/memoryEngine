@@ -42,14 +42,26 @@ versionInfo: GameID
 
 startRoom: Room 'Void'
 	"This is a featureless void.  There's another room to the north. "
-	north = northRoom
+	north = middleRoom
 ;
 +pebble: Thing 'small round pebble' 'pebble' "A small, round pebble. ";
-+me: MemoryEngineActor;
++me: Actor;
 
-northRoom: Room 'North Room'
-	"This is the north room.  The void is to the south. "
+middleRoom: Room 'Middle Room'
+	"This is the middle room.  There are rooms to the north and south. "
+	north = northRoom
 	south = startRoom
 ;
++alice: Person 'alice' 'Alice'
+	"She looks like the first person you'd turn to in a problem. "
+	isHer = true
+	isProperName = true
+;
+
+northRoom: Room 'North Room'
+	"This is the north room.  There's another room to the south. "
+	south = middleRoom
+;
++rock: Thing 'ordinary rock' 'rock' "An ordinary rock. ";
 
 gameMain: GameMainDef initialPlayerChar = me;
