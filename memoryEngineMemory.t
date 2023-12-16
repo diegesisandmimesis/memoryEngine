@@ -7,26 +7,10 @@
 
 #include "memoryEngine.h"
 
-modify MemoryEngine
-	_setFlag(obj, prop, data?) {
-		if(active != true) return(nil);
-		if(self.(prop) == nil) self.(prop) = new LookupTable();
-		if(self.(prop)[obj] == nil) {
-			if((data != nil) && data.ofKind(Memory)) {
-				self.(prop)[obj] = data.clone();
-				return(true);
-			}
-			self.(prop)[obj] = new Memory();
-		}
-		self.(prop)[obj].update(data);
-
-		return(true);
-	}
-;
-
 // Memory types
 enum memoryKnown, memoryRevealed, memorySeen;
 
+// Abstract memory class.
 class Memory: object
 	room = nil		// room the remembered object was in
 	turn = nil		// turn the remembered object was last seen
@@ -35,8 +19,10 @@ class Memory: object
 	obj = nil		// object the memory is of
 	type = nil		// type of memory
 
+	// Number of turns since the memory was updated.
 	age() { return(libGlobal.totalTurns - (self.turn ? self.turn : 0)); }
 
+	// Returns a text string of the age in turns.
 	ageInTurns() {
 		local i;
 
@@ -45,11 +31,15 @@ class Memory: object
 		return('<<toString(i)>> turn<<if(i != 1)>>s<<end>>');
 	}
 
+	// Returns the name of the location associated with the memory.
 	locationName() {
 		if(room == nil) return('nowhere');
 		return(room.getOutermostRoom().roomName);
 	}
 
+	// Update this memory.
+	// Argument is either a Memory instance or the location of
+	// the memory "update".
 	update(data?) {
 		if(data == nil) return(nil);
 		if(data.ofKind(Memory))
@@ -58,10 +48,16 @@ class Memory: object
 			return(updateLocation(data));
 	}
 
+	// Update the turn number of the memory.
 	updateTimestamp() { turn = libGlobal.totalTurns; }
 
-	updateMemory(data?) { copyFrom(data); }
+	// Update a memory using another Memory as the argument.
+	updateMemory(data?) {
+		updateTimestamp();
+		return(copyFrom(data));
+	}
 
+	// Update
 	updateLocation(loc?) {
 		room = loc;
 		updateTimestamp();
@@ -78,11 +74,6 @@ class Memory: object
 
 	// Returns a copy of this memory
 	clone() { return(new Memory().copyFrom(self)); }
-
-	construct(loc?, tn?) {
-		room = loc;
-		turn = tn;
-	}
 
 	initializeMemory() {
 		if(_tryMemoryEngine(location) == true)

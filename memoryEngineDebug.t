@@ -17,29 +17,51 @@ class MemoryTAction: MemoryAction, TAction;
 class MemoryTIAction: MemoryAction, TIAction;
 
 DefineTActionSub(DebugMemoryObject, MemoryTAction);
-VerbRule(DebugMemoryObject) 'debug' 'memory' singleDobj: DebugMemoryObjectAction
+VerbRule(DebugMemoryObject) 'mo' singleDobj: DebugMemoryObjectAction
 	verbPhrase = 'memory debug/debugging (what)'
 ;
 
-DefineTIActionSub(DebugMemoryActor, MemoryTIAction);
-VerbRule(DebugMemoryActor) 'debug' 'actor' 'memory' singleDobj singleIobj:
-	DebugMemoryActorAction
+DefineTActionSub(DebugMemoryActor, MemoryTAction);
+VerbRule(DebugMemoryActor) 'ma' singleDobj: DebugMemoryActorAction
+	verbPhrase = 'memory debug/debugging (who)'
+;
+
+DefineTIActionSub(DebugMemoryActorObject, MemoryTIAction);
+VerbRule(DebugMemoryActorObject) 'ma' singleDobj singleIobj:
+	DebugMemoryActorObjectAction
 	verbPhrase = 'memory debug/debugging (whom) (about what)'
 ;
 
 modify Thing
 	dobjFor(DebugMemoryObject) { action() { gActor._debugMemory(self); } }
-	dobjFor(DebugMemoryActor) { verify() {} }
-	iobjFor(DebugMemoryActor) { verify() {} }
+	dobjFor(DebugMemoryActor) {
+		verify() { illogical(&cantDebugMemoryNotActor); }
+	}
+	dobjFor(DebugMemoryActorObject) { verify() {} }
+	iobjFor(DebugMemoryActorObject) { verify() {} }
 ;
 
 modify Actor
 	dobjFor(DebugMemoryActor) {
+		verify() {
+			if(memoryEngine == nil)
+				illogical(&cantDebugNoMemoryEngine);
+		}
+		action() { _debugActorMemory(); }
+	}
+	dobjFor(DebugMemoryActorObject) {
+		verify() {
+			if(memoryEngine == nil)
+				illogical(&cantDebugNoMemoryEngine);
+		}
 		action() { _debugMemory(gIobj); }
 	}
 ;
 
 modify Actor
+	_debugActorMemory() {
+		memoryEngine._debugMemories();
+	}
 	_debugMemory(obj) {
 		local m;
 
@@ -61,6 +83,12 @@ modify Actor
 				"unknown memory type";
 			"\n ";
 		}
+	}
+;
+
+modify MemoryEngine
+	_debugMemories() {
+		"\n<b><<actor.name.toUpper()>> MEMORIES:</b><.p>\n ";
 	}
 ;
 

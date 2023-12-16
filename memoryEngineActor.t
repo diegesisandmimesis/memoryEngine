@@ -8,7 +8,10 @@
 #include "memoryEngine.h"
 
 modify Actor
-	memoryEngine = perInstance(new MemoryEngine)
+	//memoryEngine = perInstance(new MemoryEngine)
+	memoryEngine = nil
+
+	useMemoryEngine = true
 
 	knowsAbout(obj) {
 		return(canSee(obj) || hasSeen(obj) || getKnown(obj));
@@ -33,6 +36,30 @@ modify Actor
 	noteSeenBy(actor, prop) {
 		inherited(actor, prop);
 		actor.setSeen(self);
+	}
+
+	// Set this actor's memory engine.
+	// Called either by initializeMemoryEngineActor() (below), or
+	// from MemoryEngine.initializeMemoryEngine() (if the engine
+	// is explicitly declared in the source).
+	setMemoryEngine(obj) {
+		if((obj == nil) || !obj.ofKind(MemoryEngine))
+			return(nil);
+
+		memoryEngine = obj;
+		obj.actor = self;
+
+		return(true);
+	}
+
+	// Called at preinit, we add create a new memory engine for this
+	// actor if it doesn't already have one (because one was explicitly
+	// declared in the source), unless it's been disabled for this actor.
+	initializeMemoryEngineActor() {
+		if((memoryEngine != nil) || (useMemoryEngine != true))
+			return;
+
+		setMemoryEngine(new MemoryEngine());
 	}
 ;
 

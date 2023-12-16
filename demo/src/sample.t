@@ -62,6 +62,12 @@ northRoom: Room 'North Room'
 	"This is the north room.  There's another room to the south. "
 	south = middleRoom
 ;
++bob: Person 'bob' 'Bob'
+	"He looks like Robert, only shorter. "
+	isHim = true
+	isProperName = true
+	useMemoryEngine = nil
+;
 +rock: Thing 'ordinary rock' 'rock' "An ordinary rock. ";
 
 gameMain: GameMainDef initialPlayerChar = me;

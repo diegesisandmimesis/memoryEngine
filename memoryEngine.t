@@ -18,7 +18,12 @@ memoryEngineModuleID: ModuleID {
 class MemoryEngineObject: Syslog syslogID = 'MemoryEngine';
 
 class MemoryEngine: MemoryEngineObject
+	// Toggle for engine;  if nil, we don't record new memories and
+	// return nil for all memory checks.
 	active = true
+
+	// Actor we belong to.
+	actor = nil
 
 	// These will contain LookupTables, created on first write.
 	// We keep the data type separate (instead of basically making a
@@ -87,6 +92,15 @@ class MemoryEngine: MemoryEngineObject
 		return(true);
 	}
 
-	initializeMemoryEngine(obj) {
+	getMemory(obj) {
+	}
+
+	// Called at preinit for instances explicitly declared in the
+	// source.
+	// Try to add ourselves to our actor.
+	initializeMemoryEngine() {
+		if((location == nil) || !location.ofKind(Actor))
+			return;
+		location.setMemoryEngine(self);
 	}
 ;
