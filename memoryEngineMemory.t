@@ -13,14 +13,27 @@ enum memoryKnown, memoryRevealed, memorySeen;
 // Abstract memory class.
 class Memory: object
 	room = nil		// room the remembered object was in
-	turn = nil		// turn the remembered object was last seen
+
+	createTime = nil	// turn memory was created on
+	writeTime = nil		// turn memory was last updated
+	writeCount = 0		// number of times memory was modified
+	readTime = nil		// turn memory was last "remembered"
+	readCount = 0		// number of times the memory has been read
+
+	// Flags for replicating basic adv3 behavior.
+	known = nil
+	revealed = nil
+	seen = nil
 
 	// Properties only used for static memory declarations.
 	obj = nil		// object the memory is of
 	type = nil		// type of memory
 
 	// Number of turns since the memory was updated.
-	age() { return(libGlobal.totalTurns - (self.turn ? self.turn : 0)); }
+	age() {
+		return(libGlobal.totalTurns
+			- (self.createTime ? self.createTime : 0));
+	}
 
 	// Returns a text string of the age in turns.
 	ageInTurns() {
@@ -48,19 +61,28 @@ class Memory: object
 			return(updateLocation(data));
 	}
 
+	updateProp(prop, val) {
+		self.(prop) = (val ? val : nil);
+		updateWriteTime();
+		updateWriteCount();
+	}
+
 	// Update the turn number of the memory.
-	updateTimestamp() { turn = libGlobal.totalTurns; }
+	updateWriteTime() { writeTime = libGlobal.totalTurns; }
+	updateWriteCount() { writeCount += 1; }
+	updateReadTime() { readTime = libGlobal.totalTurns; }
+	updateReadCount() { readCount += 1; }
 
 	// Update a memory using another Memory as the argument.
 	updateMemory(data?) {
-		updateTimestamp();
+		updateWriteTime();
+		updateWriteCount();
 		return(copyFrom(data));
 	}
 
 	// Update
 	updateLocation(loc?) {
 		room = loc;
-		updateTimestamp();
 		return(true);
 	}
 
@@ -68,7 +90,14 @@ class Memory: object
 		if((obj == nil) || !obj.ofKind(Memory))
 			return(nil);
 		if(obj.room != nil) room = obj.room;
-		if(obj.turn != nil) turn = obj.turn;
+
+		if(obj.createTime != nil) createTime = obj.createTime;
+		if(obj.writeTime != nil) createTime = obj.writeTime;
+
+		if(obj.known != nil) known = obj.known;
+		if(obj.revealed != nil) revealed = obj.revealed;
+		if(obj.seen != nil) seen = obj.seen;
+
 		return(true);
 	}
 
@@ -85,5 +114,9 @@ class Memory: object
 		if((obj == nil) || !obj.ofKind(MemoryEngine))
 			return(nil);
 		return(obj.addMemory(self));
+	}
+
+	construct() {
+		createTime = (libGlobal.totalTurns ? libGlobal.totalTurns : 0);
 	}
 ;

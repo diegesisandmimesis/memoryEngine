@@ -19,24 +19,28 @@ modify Actor
 	setKnowsAbout(obj) { return(setKnown(obj)); }
 
 	hasSeen(obj) { return(getSeen(obj)); }
-	setHasSeen(obj, loc?) { return(setSeen(obj, loc)); }
+	setHasSeen(obj) { return(setSeen(obj)); }
 
 	getKnown(obj) { return(memoryEngine.getKnown(obj)); }
-	setKnown(obj, loc?) { return(memoryEngine.setKnown(obj, loc)); }
+	setKnown(obj) { return(memoryEngine.setKnown(obj)); }
 
 	getRevealed(obj) { return(memoryEngine.getRevealed(obj)); }
-	setRevealed(obj, loc?) { return(memoryEngine.setRevealed(obj, loc)); }
+	setRevealed(obj) { return(memoryEngine.setRevealed(obj)); }
 
 	getSeen(obj) { return(memoryEngine.getSeen(obj)); }
-	setSeen(obj, loc?) {
-		return(memoryEngine.setSeen(obj,
-			(loc ? loc : self.getOutermostRoom())));
+	setSeen(obj) {
+		if(memoryEngine.setSeen(obj) != true)
+			return(nil);
+		memoryEngine.setLocation(obj, obj.getOutermostRoom());
+		return(true);
 	}
 
 	noteSeenBy(actor, prop) {
 		inherited(actor, prop);
 		actor.setSeen(self);
 	}
+
+	getMemory(id) { return(memoryEngine.getMemory(id)); }
 
 	// Set this actor's memory engine.
 	// Called either by initializeMemoryEngineActor() (below), or

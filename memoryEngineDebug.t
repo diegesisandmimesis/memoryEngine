@@ -62,27 +62,27 @@ modify Actor
 	_debugActorMemory() {
 		memoryEngine._debugMemories();
 	}
-	_debugMemory(obj) {
+	_debugMemory(id) {
 		local m;
 
-		if((obj == nil) || !obj.ofKind(Thing)) {
-			"Unknown object or bad object type. ";
+		if((id == nil) || !id.ofKind(Thing)) {
+			reportFailure(&noMemoryBadArg);
+			return;
+		}
+		if((m = getMemory(id)) == nil) {
+			reportFailure(&noMemory, id);
 			return;
 		}
 
-		"<<obj.name>>\n ";
-		if((m = getSeen(obj)) == nil) {
-			"\tnever seen\n ";
-		} else {
-			"\t";
-			if(m == true)
-				"seen";
-			else if(m.ofKind(Memory))
-				m._debugMemory();
-			else
-				"unknown memory type";
-			"\n ";
-		}
+		m._debugMemory();
+/*
+		"\n <.p>\n ";
+		"\nname = <<toString(obj.name)>>\n ";
+		"\nknown = <<toString(getKnown(obj))>>\n ";
+		"\nrevealed = <<toString(getRevealed(obj))>>\n ";
+		"\nseen = <<toString(getSeen(obj))>>\n ";
+		"\n ";
+*/
 	}
 ;
 
@@ -94,8 +94,19 @@ modify MemoryEngine
 
 modify Memory
 	_debugMemory() {
-		"last seen on turn <<toString(turn)>>,
-			location = <<(room ? room.roomName : 'nowhere')>>";
+		"\n <.p> ";
+		"\nknown = <<toString(known)>>\n ";
+		"\nrevealed = <<toString(revealed)>>\n ";
+		"\nseen = <<toString(seen)>>\n ";
+		"<.p> ";
+		"createTime = <<toString(createTime)>>\n ";
+		"writeTime = <<toString(writeTime)>>\n ";
+		"writeCount = <<toString(writeCount)>>\n ";
+		"readTime = <<toString(readTime)>>\n ";
+		"readCount = <<toString(readCount)>>\n ";
+		"age = <<toString(age())>>\n ";
+		"<.p> ";
+		"room = <<(room ? room.roomName : 'nowhere')>>\n ";
 	}
 ;
 

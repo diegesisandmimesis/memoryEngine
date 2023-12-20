@@ -13,12 +13,4 @@
 
 #ifdef MEMORY_ENGINE_SIMPLE
 
-modify MemoryEngine
-	_setFlag(obj, prop, data?) {
-		if(active != true) return(nil);
-		if(self.(prop) == nil) self.(prop) = new LookupTable();
-		return(self.(prop)[obj] = true);
-	}
-;
-
 #endif // MEMORY_ENGINE_SIMPLE
