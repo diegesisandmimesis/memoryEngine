@@ -23,5 +23,6 @@
 #define gSee(id) (memoryEngineManager.setSeen(gActor, id))
 
 Memory template ->obj ->known? ->revealed? ->seen?;
+Knowledge template ->obj ->known? ->revealed? ->seen?;
 
 #define MEMORY_ENGINE_H
