@@ -7,6 +7,8 @@
 
 #include "memoryEngine.h"
 
+#ifndef MEMORY_ENGINE_SENSES
+
 modify sight senseMethod = &setSeen;
 modify sound senseMethod = &setHeard;
 modify smell senseMethod = &setSmelled;
@@ -126,3 +128,5 @@ modify Thing
 			examinee: self);
 	}
 ;
+
+#endif // MEMORY_ENGINE_SENSES

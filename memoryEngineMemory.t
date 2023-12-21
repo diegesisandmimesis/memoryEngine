@@ -2,90 +2,95 @@
 //
 // memoryEngineMemory.t
 //
-//	An alternative to full memory tracking.  Here we more or less
-//	replicate the "stock" adv3 seen/known/revealed behavior by
-//	just keeping track of a boolean state.
-//
 #include <adv3.h>
 #include <en_us.h>
 
 #include "memoryEngine.h"
 
-class Memory: MemoryEngineObject
-	// Flags for replicating basic adv3 behavior.
-	known = nil
-	revealed = nil
-	seen = nil
+#ifndef MEMORY_ENGINE_SIMPLE
 
-	// Properties only used for static memory declarations.
-	obj = nil		// object the memory is of
+// Abstract memory class.
+class Memory: SimpleMemory
+	room = nil		// room the remembered object was in
 
-	age() { return(0); }
-	ageInTurns() { return('0 turns'); }
-	locationName() { return('nowhere'); }
+	createTime = nil	// turn memory was created on
+	writeTime = nil		// turn memory was last updated
+	writeCount = 0		// number of times memory was modified
+	readTime = nil		// turn memory was last "remembered"
+	readCount = 0		// number of times the memory has been read
 
+	// Number of turns since the memory was updated.
+	age() { return(libGlobal.totalTurns
+		- (self.createTime ? self.createTime : 0)); }
+
+	// Returns a text string of the age in turns.
+	ageInTurns() {
+		local i;
+
+		i = age();
+		return('<<toString(i)>> turn<<if(i != 1)>>s<<end>>');
+	}
+
+	// Returns the name of the location associated with the memory.
+	locationName() {
+		if(room == nil) return('nowhere');
+		return(room.getOutermostRoom().roomName);
+	}
+
+	// Update this memory.
+	// Argument is either a Memory instance or the location of
+	// the memory "update".
 	update(data?) {
 		if(data == nil) return(nil);
 		if(data.ofKind(Memory))
 			return(updateMemory(data));
-		return(nil);
+		else
+			return(updateLocation(data));
 	}
 
-	updateProp(prop, val) { self.(prop) = (val ? val : nil); }
+	updateProp(prop, val) {
+		inherited(prop, val);
+		updateWriteTime();
+		updateWriteCount();
+	}
+
+	// Update the turn number of the memory.
+	updateWriteTime() { writeTime = libGlobal.totalTurns; }
+	updateWriteCount() { writeCount += 1; }
+	updateReadTime() { readTime = libGlobal.totalTurns; }
+	updateReadCount() { readCount += 1; }
 
 	// Update a memory using another Memory as the argument.
-	updateMemory(data?) { return(copyFrom(data)); }
+	updateMemory(data?) {
+		updateWriteTime();
+		updateWriteCount();
+		return(inherited(data));
+	}
 
-	updateLocation(loc?) { return(nil); }
+	// Update
+	updateLocation(loc?) {
+		room = loc;
+		return(true);
+	}
 
 	copyFrom(obj) {
-		if((obj == nil) || !obj.ofKind(Memory))
+		if(inherited(obj) == nil)
 			return(nil);
 
-		if(obj.known != nil) known = obj.known;
-		if(obj.revealed != nil) revealed = obj.revealed;
-		if(obj.seen != nil) seen = obj.seen;
+		if(obj.room != nil) room = obj.room;
+
+		if(obj.createTime != nil) createTime = obj.createTime;
+		if(obj.writeTime != nil) createTime = obj.writeTime;
 
 		return(true);
 	}
 
-	// Returns a copy of this memory
-	clone() {
-		local m;
-
-		m = new Memory();
-		m.copyFrom(self);
-
-		return(m);
+	construct() {
+		createTime = (libGlobal.totalTurns ? libGlobal.totalTurns : 0);
 	}
 
-	initializeMemory() {
-		// We only initialize memories that are declared in the
-		// source, and we only care about those if they're declared
-		// on an actor (or their memory engine).
-		if(location == nil)
-			return;
-
-		if(_tryMemoryEngine(location) == true)
-			return;
-		if(_tryMemoryActor(location) == true)
-			return;
-		_error('orphaned memory');
-	}
-
-	_tryMemoryEngine(obj) {
-		if((obj == nil) || !obj.ofKind(MemoryEngine))
-			return(nil);
-		return(obj.addMemory(self));
-	}
-
-	_tryMemoryActor(obj) {
-		if((obj == nil) || !obj.ofKind(Actor))
-			return(nil);
-		obj.initializeMemoryEngineActor();
-		return(_tryMemoryEngine(obj.memoryEngine));
-	}
-
-	lastSeenLocation() { return(nil); }
-	lastSeenTurn() { return(0); }
+	lastSeenLocation() { return(room); }
+	lastSeenTurn() { return(writeTime); }
 ;
+
+#endif // MEMORY_ENGINE_SIMPLE
