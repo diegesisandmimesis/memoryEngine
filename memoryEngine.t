@@ -99,22 +99,10 @@ class MemoryEngine: MemoryEngineObject
 	addMemory(obj) {
 		if((obj == nil) || !obj.ofKind(Memory))
 			return(nil);
-		switch(obj.type) {
-			case memoryKnown:
-				setKnown(obj.obj);
-				break;
-			case memoryRevealed:
-				setRevealed(obj.obj);
-				break;
-			case memorySeen:
-				setSeen(obj.obj);
-				break;
-			default:
-				_error('addMemory():  unknown memory type');
-				return(nil);
-		}
+		if(obj.obj == nil)
+			return(nil);
 
-		return(true);
+		return(_setMemory(obj.obj, obj));
 	}
 
 	getMemory(id) { return(_getMemory(id)); }

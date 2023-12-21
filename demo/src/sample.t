@@ -57,6 +57,7 @@ middleRoom: Room 'Middle Room'
 	isHer = true
 	isProperName = true
 ;
+++Memory ->pebble ->nil ->nil ->true;
 
 northRoom: Room 'North Room'
 	"This is the north room.  There's another room to the south. "

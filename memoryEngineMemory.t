@@ -10,8 +10,10 @@
 // Memory types
 enum memoryKnown, memoryRevealed, memorySeen;
 
+#ifndef MEMORY_ENGINE_SIMPLE
+
 // Abstract memory class.
-class Memory: object
+class Memory: SimpleMemory
 	room = nil		// room the remembered object was in
 
 	createTime = nil	// turn memory was created on
@@ -20,27 +22,15 @@ class Memory: object
 	readTime = nil		// turn memory was last "remembered"
 	readCount = 0		// number of times the memory has been read
 
-	// Flags for replicating basic adv3 behavior.
-	known = nil
-	revealed = nil
-	seen = nil
-
-	// Properties only used for static memory declarations.
-	obj = nil		// object the memory is of
-	type = nil		// type of memory
-
 	// Number of turns since the memory was updated.
-	age() {
-		return(libGlobal.totalTurns
-			- (self.createTime ? self.createTime : 0));
-	}
+	age() { return(libGlobal.totalTurns
+		- (self.createTime ? self.createTime : 0)); }
 
 	// Returns a text string of the age in turns.
 	ageInTurns() {
 		local i;
 
 		i = age();
-
 		return('<<toString(i)>> turn<<if(i != 1)>>s<<end>>');
 	}
 
@@ -62,7 +52,7 @@ class Memory: object
 	}
 
 	updateProp(prop, val) {
-		self.(prop) = (val ? val : nil);
+		inherited(prop, val);
 		updateWriteTime();
 		updateWriteCount();
 	}
@@ -77,7 +67,7 @@ class Memory: object
 	updateMemory(data?) {
 		updateWriteTime();
 		updateWriteCount();
-		return(copyFrom(data));
+		return(inherited(data));
 	}
 
 	// Update
@@ -87,36 +77,20 @@ class Memory: object
 	}
 
 	copyFrom(obj) {
-		if((obj == nil) || !obj.ofKind(Memory))
+		if(inherited(obj) == nil)
 			return(nil);
+
 		if(obj.room != nil) room = obj.room;
 
 		if(obj.createTime != nil) createTime = obj.createTime;
 		if(obj.writeTime != nil) createTime = obj.writeTime;
 
-		if(obj.known != nil) known = obj.known;
-		if(obj.revealed != nil) revealed = obj.revealed;
-		if(obj.seen != nil) seen = obj.seen;
-
 		return(true);
-	}
-
-	// Returns a copy of this memory
-	clone() { return(new Memory().copyFrom(self)); }
-
-	initializeMemory() {
-		if(_tryMemoryEngine(location) == true)
-			return;
-		_error('orphaned memory');
-	}
-
-	_tryMemoryEngine(obj) {
-		if((obj == nil) || !obj.ofKind(MemoryEngine))
-			return(nil);
-		return(obj.addMemory(self));
 	}
 
 	construct() {
 		createTime = (libGlobal.totalTurns ? libGlobal.totalTurns : 0);
 	}
 ;
+
+#endif // MEMORY_ENGINE_SIMPLE

@@ -8,6 +8,8 @@
 #include "memoryEngine.h"
 
 memoryEnginePreinit: MemoryEngineObject, PreinitObject
+	syslogID = 'memoryEnginePreinit'
+
 	execute() {
 		initMemories();
 		initMemoryEngines();
@@ -15,18 +17,21 @@ memoryEnginePreinit: MemoryEngineObject, PreinitObject
 	}
 
 	initMemories() {
+		_debug('initMemories()');
 		forEachInstance(Memory, function(o) {
 			o.initializeMemory();
 		});
 	}
 
 	initMemoryEngines() {
+		_debug('initMemoryEngines()');
 		forEachInstance(MemoryEngine, function(o) {
 			o.initializeMemoryEngine();
 		});
 	}
 
 	initMemoryEngineActors() {
+		_debug('initMemoryEngineActors()');
 		forEachInstance(Actor, function(o) {
 			o.initializeMemoryEngineActor();
 		});

@@ -75,39 +75,50 @@ modify Actor
 		}
 
 		m._debugMemory();
-/*
-		"\n <.p>\n ";
-		"\nname = <<toString(obj.name)>>\n ";
-		"\nknown = <<toString(getKnown(obj))>>\n ";
-		"\nrevealed = <<toString(getRevealed(obj))>>\n ";
-		"\nseen = <<toString(getSeen(obj))>>\n ";
-		"\n ";
-*/
 	}
 ;
 
 modify MemoryEngine
 	_debugMemories() {
-		"\n<b><<actor.name.toUpper()>> MEMORIES:</b><.p>\n ";
+		"\n<.p> ";
+		if(_memory == nil) {
+			reportFailure(&cantDebugNoActorMemories);
+			return;
+		}
+		_memory.forEachAssoc(function(k, v) {
+			"\nobject:  <<k.name>>\n ";
+			v._debugMemory('\t');
+			"\n<.p> ";
+		});
 	}
 ;
 
 modify Memory
-	_debugMemory() {
-		"\n <.p> ";
-		"\nknown = <<toString(known)>>\n ";
-		"\nrevealed = <<toString(revealed)>>\n ";
-		"\nseen = <<toString(seen)>>\n ";
-		"<.p> ";
-		"createTime = <<toString(createTime)>>\n ";
-		"writeTime = <<toString(writeTime)>>\n ";
-		"writeCount = <<toString(writeCount)>>\n ";
-		"readTime = <<toString(readTime)>>\n ";
-		"readCount = <<toString(readCount)>>\n ";
-		"age = <<toString(age())>>\n ";
-		"<.p> ";
-		"room = <<(room ? room.roomName : 'nowhere')>>\n ";
+	_output(str, prefix?) { "\n<<(prefix ? prefix : '')>><<str>>\n "; }
+	_debugMemory(prefix?) {
+		_output(' <.p> ', prefix);
+		_output('known = <<toString(known)>>', prefix);
+		_output('revealed = <<toString(revealed)>>', prefix);
+		_output('seen = <<toString(seen)>>', prefix);
+		_output(' <.p> ', prefix);
 	}
 ;
+
+#ifndef MEMORY_ENGINE_SIMPLE
+modify Memory
+	_debugMemory(prefix?) {
+		inherited(prefix);
+
+		_output('createTime = <<toString(createTime)>>', prefix);
+		_output('writeTime = <<toString(writeTime)>>', prefix);
+		_output('writeCount = <<toString(writeCount)>>', prefix);
+		_output('readTime = <<toString(readTime)>>', prefix);
+		_output('readCount = <<toString(readCount)>>', prefix);
+		_output('age = <<toString(age())>>', prefix);
+		_output('<.p>', prefix);
+		_output('room = <<(room ? room.roomName : 'nowhere')>>', prefix);
+	}
+;
+#endif // MEMORY_ENGINE_SIMPLE
 
 #endif // __DEBUG_MEMORY_ENGINE

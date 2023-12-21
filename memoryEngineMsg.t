@@ -12,6 +12,7 @@
 modify playerActionMessages
 	// Debugging
 	cantDebugMemoryNotActor = 'The first argument must be an actor. '
+	cantDebugNoActorMemories = '{You/He dobj} {has} no memories. '
 	cantDebugNoMemoryEngine = 'Memory engine not enabled for
 		{you/her dobj}. '
 
