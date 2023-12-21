@@ -24,6 +24,18 @@ memoryEngineManager: MemoryEngineObject
 	getKnown(actor, id) { return(_callMethod(actor, id, &getKnown)); }
 	setKnown(actor, id) { return(_callMethod(actor, id, &setKnown)); }
 
+	getHeard(actor, id) { return(_callMethod(actor, id, &getHeard)); }
+	setHeard(actor, id) { return(_callMethod(actor, id, &setHeard)); }
+
+	getSmelled(actor, id) { return(_callMethod(actor, id, &getSmelled)); }
+	setSmelled(actor, id) { return(_callMethod(actor, id, &setSmelled)); }
+
+	getTasted(actor, id) { return(_callMethod(actor, id, &getTasted)); }
+	setTasted(actor, id) { return(_callMethod(actor, id, &setTasted)); }
+
+	getTouched(actor, id) { return(_callMethod(actor, id, &getTouched)); }
+	setTouched(actor, id) { return(_callMethod(actor, id, &setTouched)); }
+
 	getRevealed(actor, id) { return(_callMethod(actor, id, &getRevealed)); }
 	setRevealed(actor, id) { return(_callMethod(actor, id, &setRevealed)); }
 

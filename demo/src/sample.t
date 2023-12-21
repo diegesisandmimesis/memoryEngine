@@ -45,6 +45,10 @@ startRoom: Room 'Void'
 	north = middleRoom
 ;
 +pebble: Thing 'small round pebble' 'pebble' "A small, round pebble. ";
++flower: Thing 'smelly flower' 'flower'
+	"A smelly flower. "
+	smellPresence = true
+;
 +me: Actor;
 
 middleRoom: Room 'Middle Room'

@@ -35,11 +35,12 @@ modify Actor
 		return(true);
 	}
 
+/*
 	noteSeenBy(actor, prop) {
 		inherited(actor, prop);
 		actor.setSeen(self);
 	}
-
+*/
 	getMemory(id) { return(memoryEngine.getMemory(id)); }
 
 	// Set this actor's memory engine.
