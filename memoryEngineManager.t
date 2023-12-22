@@ -7,7 +7,11 @@
 
 #include "memoryEngine.h"
 
+// Singleton for handling the global macros.
 memoryEngineManager: MemoryEngineObject
+	// Canonicalize the actor.
+	// Returns the arg if the arg is an actor, or gActor if gActor is
+	// defined, and nil otherwise.
 	_resolveActor(actor?) {
 		if((actor != nil) && actor.ofKind(Actor))
 			return(actor);
@@ -16,6 +20,7 @@ memoryEngineManager: MemoryEngineObject
 		return(nil);
 	}
 
+	// Generic way of calling a method on an actor.
 	_callMethod(actor, id, prop) {
 		if((actor == _resolveActor(actor)) == nil) return(nil);
 		return(actor.(prop)(id));
@@ -23,6 +28,9 @@ memoryEngineManager: MemoryEngineObject
 
 	getKnown(actor, id) { return(_callMethod(actor, id, &getKnown)); }
 	setKnown(actor, id) { return(_callMethod(actor, id, &setKnown)); }
+
+	getRevealed(actor, id) { return(_callMethod(actor, id, &getRevealed)); }
+	setRevealed(actor, id) { return(_callMethod(actor, id, &setRevealed)); }
 
 	getHeard(actor, id) { return(_callMethod(actor, id, &getHeard)); }
 	setHeard(actor, id) { return(_callMethod(actor, id, &setHeard)); }
@@ -35,9 +43,6 @@ memoryEngineManager: MemoryEngineObject
 
 	getTouched(actor, id) { return(_callMethod(actor, id, &getTouched)); }
 	setTouched(actor, id) { return(_callMethod(actor, id, &setTouched)); }
-
-	getRevealed(actor, id) { return(_callMethod(actor, id, &getRevealed)); }
-	setRevealed(actor, id) { return(_callMethod(actor, id, &setRevealed)); }
 
 	getSeen(actor, id) { return(_callMethod(actor, id, &getSeen)); }
 	setSeen(actor, id) { return(_callMethod(actor, id, &setSeen)); }

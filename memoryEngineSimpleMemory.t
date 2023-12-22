@@ -11,7 +11,7 @@
 
 #include "memoryEngine.h"
 
-class SimpleMemory: MemoryEngineObject
+class Memory: MemoryEngineObject
 	// Flags for replicating basic adv3 behavior.
 	known = nil
 	revealed = nil
@@ -91,7 +91,3 @@ class SimpleMemory: MemoryEngineObject
 	lastSeenLocation() { return(nil); }
 	lastSeenTurn() { return(0); }
 ;
-
-#ifdef MEMORY_ENGINE_SIMPLE
-class Memory: SimpleMemory;
-#endif // MEMORY_ENGINE_SIMPLE

@@ -74,6 +74,15 @@ class MemoryEngine: MemoryEngineObject
 
 		return(true);
 	}
+
+	// Wrapper for _setProp that also sets the known property
+	// to be true.  Used for direct sense properties; seeing something
+	// automatically makes it known.
+	_setSenseProp(id, prop, val?) {
+		if(_setProp(id, prop, val) != true)
+			return(nil);
+		return(setKnown(id));
+	}
 		
 	// Type-specific getters and setters.
 	getKnown(obj) { return(_getProp(obj, &known)); }
@@ -83,7 +92,7 @@ class MemoryEngine: MemoryEngineObject
 	setRevealed(obj) { return(_setProp(obj, &revealed, true)); }
 
 	getSeen(obj) { return(_getProp(obj, &seen)); }
-	setSeen(obj) { return(_setProp(obj, &seen, true)); }
+	setSeen(obj) { return(_setSenseProp(obj, &seen, true)); }
 
 	getLocation(obj) { return(_getProp(obj, &room)); }
 	setLocation(obj, v) { return(_setProp(obj, &room, v)); }

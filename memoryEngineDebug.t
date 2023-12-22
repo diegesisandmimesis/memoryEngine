@@ -86,6 +86,8 @@ modify MemoryEngine
 			return;
 		}
 		_memory.forEachAssoc(function(k, v) {
+			if(k.hideFromAll(LookAction))
+				return;
 			"\nobject:  <<k.name>>\n ";
 			v._debugMemory('\t');
 			"\n<.p> ";
@@ -100,12 +102,12 @@ modify Memory
 		_output('known = <<toString(known)>>', prefix);
 		_output('revealed = <<toString(revealed)>>', prefix);
 		_output('seen = <<toString(seen)>>', prefix);
-#ifndef MEMORY_ENGINE_SENSES
+#ifndef MEMORY_ENGINE_NO_SENSES
 		_output('heard = <<toString(heard)>>', prefix);
 		_output('smelled = <<toString(smelled)>>', prefix);
 		_output('touched = <<toString(touched)>>', prefix);
 		_output('tasted = <<toString(tasted)>>', prefix);
-#endif // MEMORY_ENGINE_SENSES
+#endif // MEMORY_ENGINE_NO_SENSES
 		_output(' <.p> ', prefix);
 	}
 ;

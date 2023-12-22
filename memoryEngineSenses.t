@@ -2,18 +2,23 @@
 //
 // memoryEngineSenses.t
 //
+//	Extends the base adv3 sense memory model to include senses other
+//	than sight.
+//
 #include <adv3.h>
 #include <en_us.h>
 
 #include "memoryEngine.h"
 
-#ifndef MEMORY_ENGINE_SENSES
+#ifndef MEMORY_ENGINE_NO_SENSES
 
+// Define a method (on Actor) to flag an object as sensed via the given sense.
 modify sight senseMethod = &setSeen;
 modify sound senseMethod = &setHeard;
 modify smell senseMethod = &setSmelled;
 modify touch senseMethod = &setTocuhed;
 
+// Create a Sense instance for taste.
 taste: Sense
 	thruProp = &tasteThru
 	sizeProp = &tasteSize
@@ -21,6 +26,7 @@ taste: Sense
 	senseMethod = &setTasted
 ;
 
+// Extend our Memory class to include flags for all the senses.
 modify Memory
 	heard = nil
 	smelled = nil
@@ -28,32 +34,35 @@ modify Memory
 	touched = nil
 ;
 
+// Add convenience methods for accessing the new sense properties
+// to MemoryEngine.
 modify MemoryEngine
 	getHeard(obj) { return(_getProp(obj, &heard)); }
-	setHeard(obj) { return(_setProp(obj, &heard, true)); }
+	setHeard(obj) { return(_setSenseProp(obj, &heard, true)); }
 
 	getSmelled(obj) { return(_getProp(obj, &smelled)); }
-	setSmelled(obj) { return(_setProp(obj, &smelled, true)); }
+	setSmelled(obj) { return(_setSenseProp(obj, &smelled, true)); }
 
 	getTasted(obj) { return(_getProp(obj, &tasted)); }
-	setTasted(obj) { return(_setProp(obj, &tasted, true)); }
+	setTasted(obj) { return(_setSenseProp(obj, &tasted, true)); }
 
 	getTouched(obj) { return(_getProp(obj, &touched)); }
-	setTouched(obj) { return(_setProp(obj, &touched, true)); }
+	setTouched(obj) { return(_setSenseProp(obj, &touched, true)); }
 ;
 
 modify Actor
-	getHeard(obj) { return(memoryEngine.getHeard(obj)); }
-	setHeard(obj) { return(memoryEngine.setHeard(obj)); }
+	// Methods for accessing the new sense properties.
+	getHeard(obj) { return(_getMemoryProp(&getHeard, obj)); }
+	setHeard(obj) { return(_getMemoryProp(&setHeard, obj)); }
 
-	getSmelled(obj) { return(memoryEngine.getSmelled(obj)); }
-	setSmelled(obj) { return(memoryEngine.setSmelled(obj)); }
+	getSmelled(obj) { return(_getMemoryProp(&getSmelled, obj)); }
+	setSmelled(obj) { return(_getMemoryProp(&setSmelled, obj)); }
 
-	getTasted(obj) { return(memoryEngine.getTasted(obj)); }
-	setTasted(obj) { return(memoryEngine.setTasted(obj)); }
+	getTasted(obj) { return(_getMemoryProp(&getTasted, obj)); }
+	setTasted(obj) { return(_getMemoryProp(&setTasted, obj)); }
 
-	getTouched(obj) { return(memoryEngine.getTouched(obj)); }
-	setTouched(obj) { return(memoryEngine.setTouched(obj)); }
+	getTouched(obj) { return(_getMemoryProp(&getTouched, obj)); }
+	setTouched(obj) { return(_getMemoryProp(&setTouched, obj)); }
 
 	// Generic sense handler.
 	// By default we'll only ever be called by Thing.lookAroundWithinSense()
@@ -64,32 +73,19 @@ modify Actor
 		setKnowsAbout(obj);
 
 		self.(sense.senseMethod)(obj);
-/*
-		switch(sense) {
-			case sight:
-				setSeen(obj);
-				break;
-			case sound:
-				setHeard(obj);
-				break;
-			case smell:
-				setSmelled(obj);
-				break;
-			case touch:
-				setTouched(obj);
-				break;
-			case taste:
-				setTasted(obj);
-				break;
-		}
-*/
 	}
 ;
 
+// Update Thing to auto-flag more senses.
 modify Thing
+	// Flags analogous to suppressAutoSeen for other "broadcast"
+	// senses.  We don't do this for touch or taste because those
+	// senses by default are never applied automatically by something in
+	// the ambient environment.
 	suppressAutoHeard = nil
 	suppressAutoSmelled = nil
 
+	// Equivalents for noteSeenBy().
 	noteHeardBy(actor, prop) { actor.setHeard(self); }
 	noteSmelledBy(actor, prop) { actor.setSmelled(self); }
 	noteTastedBy(actor, prop) { actor.setTasted(self); }

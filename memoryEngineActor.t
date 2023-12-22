@@ -7,41 +7,59 @@
 
 #include "memoryEngine.h"
 
+// Modifications for the Actor class.
+// By default all actors get their own memory engine.
 modify Actor
-	//memoryEngine = perInstance(new MemoryEngine)
 	memoryEngine = nil
 
 	useMemoryEngine = true
 
+	// Replacements for the stock adv3 "knows" methods.
 	knowsAbout(obj) {
-		return(canSee(obj) || hasSeen(obj) || getKnown(obj));
+		return(canSense(obj) || hasSensed(obj) || getKnown(obj));
 	}
 	setKnowsAbout(obj) { return(setKnown(obj)); }
 
+	// Replacements for the stock adv3 "seen" methods.
 	hasSeen(obj) { return(getSeen(obj)); }
 	setHasSeen(obj) { return(setSeen(obj)); }
 
-	getKnown(obj) { return(memoryEngine.getKnown(obj)); }
-	setKnown(obj) { return(memoryEngine.setKnown(obj)); }
+	// Generic sense/sense memory methods.
+	// These are used for "automatic" sense perceptions.  That is,
+	// sensing something as part of the ambient environment, rather
+	// than as a direct, intentional examination of the thing being
+	// sensed:  the player walks into a room containing a refrigerator
+	// and they'll see it even if they weren't looking for a fridge.
+	canSense(obj) { return(canSee(obj) || canHear(obj) || canSmell(obj)); }
+	hasSensed(obj) {
+		return(getSeen(obj) || getHeard(obj) || getSmelled(obj));
+	}
 
-	getRevealed(obj) { return(memoryEngine.getRevealed(obj)); }
-	setRevealed(obj) { return(memoryEngine.setRevealed(obj)); }
+	// General utility method for getting a property off a method,
+	// checking for the existence of a memory engine first.
+	_getMemoryProp(prop, obj) {
+		return(memoryEngine ? memoryEngine.(prop)(obj) : nil);
+	}
 
-	getSeen(obj) { return(memoryEngine.getSeen(obj)); }
+	getKnown(obj) { return(_getMemoryProp(&getKnown, obj)); }
+	setKnown(obj) { return(_getMemoryProp(&setKnown, obj)); }
+
+	getRevealed(obj) { return(_getMemoryProp(&getKnown, obj)); }
+	setRevealed(obj) { return(_getMemoryProp(&setKnown, obj)); }
+
+	getSeen(obj) { return(_getMemoryProp(&getSeen, obj)); }
 	setSeen(obj) {
+		if(memoryEngine == nil)
+			return(nil);
 		if(memoryEngine.setSeen(obj) != true)
 			return(nil);
 		memoryEngine.setLocation(obj, obj.getOutermostRoom());
 		return(true);
 	}
 
-/*
-	noteSeenBy(actor, prop) {
-		inherited(actor, prop);
-		actor.setSeen(self);
+	getMemory(id) {
+		return(memoryEngine ? memoryEngine.getMemory(id) : nil);
 	}
-*/
-	getMemory(id) { return(memoryEngine.getMemory(id)); }
 
 	// Set this actor's memory engine.
 	// Called either by initializeMemoryEngineActor() (below), or
@@ -67,4 +85,3 @@ modify Actor
 		setMemoryEngine(new MemoryEngine());
 	}
 ;
-

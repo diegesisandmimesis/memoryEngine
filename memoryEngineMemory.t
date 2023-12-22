@@ -9,8 +9,8 @@
 
 #ifndef MEMORY_ENGINE_SIMPLE
 
-// Abstract memory class.
-class Memory: SimpleMemory
+// Extensions to the basic memory class.
+modify Memory
 	room = nil		// room the remembered object was in
 
 	createTime = nil	// turn memory was created on
