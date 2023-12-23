@@ -2,6 +2,122 @@
 //
 // memoryEngine.t
 //
+//	A TADS3/adv3 module for working with sense memories and knowledge.
+//
+//	By default adv3 keeps track of what an actor knows about by setting
+//	flags on objects.  This module tracks this kind of information in
+//	lookup tables, by default on a per-actor basis.
+//
+//
+// BASIC USAGE
+//
+//	In addition to accessing memories via the standard adv3 methods
+//	(knowsAbout(), hasSeen(), and so on), the module adds several
+//	methods to Actor:
+//
+//
+//		canSense(obj)
+//			boolean true if the actor can detect the given object
+//			via any sense
+//
+//		hasSensed(obj)
+//			boolean true if the actor has previously detected the
+//			given object via any sense
+//
+//		getMemory(obj)
+//			returns the actor's Memory instace for the given object
+//
+//
+//	In addition, there getters and setters for each Memory property:
+//
+//		getDescribed(obj)
+//		setDescribed(obj)
+//			Get or set the "described" property, indicating that
+//			the actor has directly examined the object
+//
+//		getKnown(obj)
+//		setKnown(obj)
+//			Get or set the "known" property, indicating that
+//			the actor knows about the object
+//
+//		getRevealed(obj)
+//		setRevealed(obj)
+//			Get or set the "revealed" property, indicating that
+//			the actor knows about the subject.  In base adv3
+//			this is for conversational subject instead of physical
+//			objects, but this module is agnostic about the class
+//			of object a memory represents
+//
+//		getSeen(obj)
+//		setSeen(obj)
+//			Get or set the "seen" property, indicating that
+//			the actor has seen the object
+//
+//
+//	If the module is NOT compiled with -D SIMPLE_MEMORY_NO_SENSES then
+//	the following methods will also be available:
+//
+//		getHeard(obj)
+//		setHeard(obj)
+//			Get or set the "heard" property, indicating that
+//			the actor has heard the object
+//
+//		getSmelled(obj)
+//		setSmelled(obj)
+//			Get or set the "smelled" property, indicating that
+//			the actor has smelled the object
+//
+//		getTasted(obj)
+//		setTasted(obj)
+//			Get or set the "tasted" property, indicating that
+//			the actor has tasted the object
+//
+//		getTouched(obj)
+//		setTouched(obj)
+//			Get or set the "touched" property, indicating that
+//			the actor has touched the object
+//
+//
+// DECLARING MEMORIES IN SOURCE
+//
+//	You can manually add memories to an actor (so they're available
+//	at the start of the game) via something like:
+//
+//		alice: Person 'alice' 'Alice'
+//			"She looks like the first person you'd turn to
+//			in a problem. "
+//			isHer = true
+//			isProperName = true
+//		;
+//		+Memory ->pebble ->true;
+//
+//	In this example the NPC alice will start the game knowing about
+//	the pebble object.
+//
+//	The template is:
+//
+//		Memory ->obj ->known? ->revealed? ->seen? ->described?
+//
+//	Where obj is the object the memory is of, and the remaining arguments
+//	are the named memory flags.
+//
+//
+//
+// COMPILER FLAGS
+//
+//	-D MEMORY_ENGINE_SIMPLE
+//		Compiling with this flag will disable most of the extra
+//		features, and the module will just replicate the functionality
+//		of base adv3 (only using lookup tables instead of object
+//		properties)
+//
+//	-D MEMORY_ENGINE_NO_SENSES
+//		Compiling with this flag will disable the additional sense
+//		data tracking.  This means that sight will be the only sense
+//		tracked (replicating the stock adv3 behavior).  By default
+//		the module will keep track of all five senses.
+//
+//
 #include <adv3.h>
 #include <en_us.h>
 

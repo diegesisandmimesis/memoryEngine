@@ -32,6 +32,27 @@ modify Memory
 	smelled = nil
 	tasted = nil
 	touched = nil
+
+	clearMemory() {
+		inherited();
+
+		heard = nil;
+		smelled = nil;
+		tasted = nil;
+		touched = nil;
+	}
+
+	copyFrom(obj, clear?) {
+		if(inherited(obj) == nil)
+			return(nil);
+
+		if(obj.heard != nil) heard = obj.heard;
+		if(obj.smelled != nil) smelled = obj.smelled;
+		if(obj.tasted != nil) tasted = obj.tasted;
+		if(obj.touched != nil) touched = obj.touched;
+
+		return(true);
+	}
 ;
 
 // Add convenience methods for accessing the new sense properties

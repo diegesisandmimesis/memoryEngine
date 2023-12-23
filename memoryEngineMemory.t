@@ -2,27 +2,39 @@
 //
 // memoryEngineMemory.t
 //
+//	Provides the memory class.
+//
 #include <adv3.h>
 #include <en_us.h>
 
 #include "memoryEngine.h"
 
+// Base memory class.
+// If the module is compiled with -D MEMORY_ENGINE_SIMPLE this is all that
+// is used.  But by default (compiled without any flags) the Memory
+// class will be extended in the code block following this declaration.
+// In addition, this declaration only includes the "seen" flag, and no
+// flags for other senses.  This mirrors the stock adv3 behavior, but by
+// default the additions in memoryEngineSenses.t will extend this to the
+// other senses as well.
 class Memory: MemoryEngineObject
 	// Flags for replicating basic adv3 behavior.
-	described = nil
-	known = nil
-	revealed = nil
-	seen = nil
-
-	knowledge = nil
+	described = nil		// has the object been directly examined
+	known = nil		// has the object been detected by the senses
+	revealed = nil		// has the object been revealed
+	seen = nil		// has the object been seen
 
 	// Properties only used for static memory declarations.
 	obj = nil		// object the memory is of
 
+	// Stub methods for stuff that isn't tracked in the base
+	// memory model.  This is just to make fallback more graceful if
+	// the module is compiled with -D MEMORY_ENGINE_SIMPLE for testing.
 	age() { return(0); }
 	ageInTurns() { return('0 turns'); }
 	locationName() { return('nowhere'); }
 
+	// Generic memory update method.  Arg is another Memory instance.
 	update(data?) {
 		if(data == nil) return(nil);
 		if(data.ofKind(Memory))
@@ -30,16 +42,35 @@ class Memory: MemoryEngineObject
 		return(nil);
 	}
 
+	// Convenience method for updating a memory property.  Mostly
+	// provided to make implementing named getters and setters less
+	// verbose.
 	updateProp(prop, val) { self.(prop) = (val ? val : nil); }
 
 	// Update a memory using another Memory as the argument.
 	updateMemory(data?) { return(copyFrom(data)); }
 
+	// Stub method for updating the location.  Not tracked in the base
+	// class.
 	updateLocation(loc?) { return(nil); }
 
-	copyFrom(obj) {
+	clearMemory() {
+		described = nil;
+		known = nil;
+		revealed = nil;
+		seen = nil;
+
+		obj = nil;
+	}
+
+	// Copy properties from the argument, which has to be another
+	// Memory instance.
+	copyFrom(obj, clear?) {
 		if((obj == nil) || !obj.ofKind(Memory))
 			return(nil);
+
+		if(clear == true)
+			clearMemory();
 
 		if(obj.described != nil) described = obj.described;
 		if(obj.known != nil) known = obj.known;
@@ -73,19 +104,32 @@ class Memory: MemoryEngineObject
 		_error('orphaned memory');
 	}
 
+	// If the argument is a memory engine, add ourselves to it.
 	_tryMemoryEngine(obj) {
 		if((obj == nil) || !obj.ofKind(MemoryEngine))
 			return(nil);
 		return(obj.addMemory(self));
 	}
 
+	// If the argument is an actor, try to add ourselves to their
+	// memory engine, initializing it if necessary.
 	_tryMemoryActor(obj) {
 		if((obj == nil) || !obj.ofKind(Actor))
 			return(nil);
+
+		// At this stage of preinit, actors that don't have
+		// statically declared memory engines won't have had a
+		// default created for them yet, so we have to manually
+		// call the initializer to make sure there's an engine
+		// for us to add ourselves to.  If the actor DOES already
+		// have a memory engine, calling the initializer does
+		// nothing.
 		obj.initializeMemoryEngineActor();
+
 		return(_tryMemoryEngine(obj.memoryEngine));
 	}
 
+	// More stub methods for stuff we don't track in the base class.
 	lastSeenLocation() { return(nil); }
 	lastSeenTurn() { return(0); }
 ;
@@ -93,6 +137,9 @@ class Memory: MemoryEngineObject
 #ifndef MEMORY_ENGINE_SIMPLE
 
 // Extensions to the basic memory class.
+// This is all in a big preprocessor conditional, so all of this
+// gets applied if -D MEMORY_ENGINE_SIMPLE is NOT given at compile-time,
+// which is the default.
 modify Memory
 	room = nil		// room the remembered object was in
 
@@ -101,6 +148,17 @@ modify Memory
 	writeCount = 0		// number of times memory was modified
 	readTime = nil		// turn memory was last "remembered"
 	readCount = 0		// number of times the memory has been read
+
+	clearMemory() {
+		inherited();
+
+		room = nil;
+		createTime = nil;
+		writeTime = nil;
+		writeCount = 0;
+		readTime = nil;
+		readCount = 0;
+	}
 
 	// Number of turns since the memory was updated.
 	age() { return(libGlobal.totalTurns
@@ -131,13 +189,15 @@ modify Memory
 			return(updateLocation(data));
 	}
 
+	// Utility method to update a single property.
+	// We also update the write time and count.
 	updateProp(prop, val) {
 		inherited(prop, val);
 		updateWriteTime();
 		updateWriteCount();
 	}
 
-	// Update the turn number of the memory.
+	// Update the turn number and count of the memory.
 	updateWriteTime() { writeTime = libGlobal.totalTurns; }
 	updateWriteCount() { writeCount += 1; }
 	updateReadTime() { readTime = libGlobal.totalTurns; }
@@ -150,24 +210,33 @@ modify Memory
 		return(inherited(data));
 	}
 
-	// Update
+	// Update the location of the memory.
 	updateLocation(loc?) {
+		updateWriteTime();
+		updateWriteCount();
 		room = loc;
 		return(true);
 	}
 
+	// Set our properties from the given object's.
+	// We do all the stuff the base class definition does, and then
+	// handle some additional properties.
+	// We don't track counts, maybe a misfeature?
 	copyFrom(obj) {
 		if(inherited(obj) == nil)
 			return(nil);
 
 		if(obj.room != nil) room = obj.room;
-
 		if(obj.createTime != nil) createTime = obj.createTime;
 		if(obj.writeTime != nil) createTime = obj.writeTime;
+
+		if(createTime == nil)
+			createTime = libGlobal.totalTurns;
 
 		return(true);
 	}
 
+	// The constructor sets the memory's creation time.
 	construct() {
 		createTime = (libGlobal.totalTurns ? libGlobal.totalTurns : 0);
 	}

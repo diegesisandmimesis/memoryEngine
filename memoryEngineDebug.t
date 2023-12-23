@@ -2,6 +2,12 @@
 //
 // memoryEngineDebug.t
 //
+//	Implements a few debugging actions.
+//
+//	>MA [actor]		shows all the memories for the given actor
+//	>MA [actor] [object]	shows the actor's memory for the object
+//	>MO [object]		shows the player's memory for the object
+//
 #include <adv3.h>
 #include <en_us.h>
 

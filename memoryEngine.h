@@ -43,7 +43,6 @@
 #define gHasTouched(id) (memoryEngineManager.getTouched(gActor, id))
 #define gTouch(id) (memoryEngineManager.setTouched(gActor, id))
 
-Memory template ->obj ->known? ->revealed? ->seen?;
-Knowledge template ->obj ->known? ->revealed? ->seen?;
+Memory template ->obj ->known? ->revealed? ->seen? ->described?;
 
 #define MEMORY_ENGINE_H

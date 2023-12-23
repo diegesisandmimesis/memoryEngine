@@ -2,6 +2,8 @@
 //
 // memoryEngineManager.t
 //
+//	Provides a singleton used by the global macros.
+//
 #include <adv3.h>
 #include <en_us.h>
 
