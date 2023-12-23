@@ -1,6 +1,6 @@
 #charset "us-ascii"
 //
-// memoryEngineActor.t
+// memoryEngineThing.t
 //
 #include <adv3.h>
 #include <en_us.h>
@@ -9,7 +9,14 @@
 
 modify Thing
 	noteSeenBy(actor, prop) {
-		inherited(actor, prop);
 		actor.setSeen(self);
+	}
+	basicExamine() {
+		local r;
+
+		r = described;
+		inherited();
+		if((gActor != nil) && (described != r) && described)
+			gActor.setDescribed(self);
 	}
 ;

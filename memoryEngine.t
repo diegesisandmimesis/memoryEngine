@@ -15,6 +15,8 @@ memoryEngineModuleID: ModuleID {
         listingOrder = 99
 }
 
+// Generic module-specific object class.
+// We do this to make logging easier.
 class MemoryEngineObject: Syslog syslogID = 'MemoryEngine';
 
 class MemoryEngine: MemoryEngineObject
@@ -85,6 +87,9 @@ class MemoryEngine: MemoryEngineObject
 	}
 		
 	// Type-specific getters and setters.
+	getDescribed(obj) { return(_getProp(obj, &described)); }
+	setDescribed(obj) { return(_setProp(obj, &described, true)); }
+
 	getKnown(obj) { return(_getProp(obj, &known)); }
 	setKnown(obj) { return(_setProp(obj, &known, true)); }
 

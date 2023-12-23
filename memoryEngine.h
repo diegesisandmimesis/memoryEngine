@@ -10,6 +10,15 @@
 // known/revealed/seen behavior.
 //#define MEMORY_ENGINE_SIMPLE
 
+#include "syslog.h"
+#ifndef SYSLOG_H
+#error "This module requires the syslog module."
+#error "https://github.com/diegesisandmimesis/syslog"
+#error "It should be in the same parent directory as this module.  So if"
+#error "memoryEngine is in /home/user/tads/memoryEngine, then"
+#error "syslog should be in /home/user/tads/syslog ."
+#endif // SYSLOG_H
+
 #undef gRevealed
 #define gRevealed(id) (memoryEngineManager.getRevealed(gActor, id))
 

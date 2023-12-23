@@ -41,6 +41,9 @@ modify Actor
 		return(memoryEngine ? memoryEngine.(prop)(obj) : nil);
 	}
 
+	getDescribed(obj) { return(_getMemoryProp(&getDescribed, obj)); }
+	setDescribed(obj) { return(_getMemoryProp(&setDescribed, obj)); }
+
 	getKnown(obj) { return(_getMemoryProp(&getKnown, obj)); }
 	setKnown(obj) { return(_getMemoryProp(&setKnown, obj)); }
 

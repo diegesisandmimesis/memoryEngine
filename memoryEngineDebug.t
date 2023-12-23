@@ -99,6 +99,7 @@ modify Memory
 	_output(str, prefix?) { "\n<<(prefix ? prefix : '')>><<str>>\n "; }
 	_debugMemory(prefix?) {
 		_output(' <.p> ', prefix);
+		_output('described = <<toString(described)>>', prefix);
 		_output('known = <<toString(known)>>', prefix);
 		_output('revealed = <<toString(revealed)>>', prefix);
 		_output('seen = <<toString(seen)>>', prefix);

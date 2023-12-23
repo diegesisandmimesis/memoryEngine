@@ -7,6 +7,8 @@
 
 #include "memoryEngine.h"
 
+// Preinint singleton that handles memory stuff explicitly declared in
+// the source.
 memoryEnginePreinit: MemoryEngineObject, PreinitObject
 	syslogID = 'memoryEnginePreinit'
 

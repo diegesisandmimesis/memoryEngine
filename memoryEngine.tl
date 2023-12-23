@@ -3,7 +3,6 @@ source: memoryEngine.t
 source: memoryEngineThing.t
 source: memoryEngineActor.t
 source: memoryEngineManager.t
-source: memoryEngineSimpleMemory.t
 source: memoryEngineMemory.t
 source: memoryEngineSenses.t
 source: memoryEnginePreinit.t
