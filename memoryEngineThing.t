@@ -19,4 +19,26 @@ modify Thing
 		if((gActor != nil) && (described != r) && described)
 			gActor.setDescribed(self);
 	}
+
+	basicExamineListen(explicit) {
+		if(explicit == true)
+			gActor.setHeard(self);
+		inherited(explicit);
+	}
+
+	basicExamineSmell(explicit) {
+		if(explicit == true)
+			gActor.setSmelled(self);
+		inherited(explicit);
+	}
+
+	basicExamineTaste() {
+		gActor.setTasted(self);
+		inherited();
+	}
+
+	basicExamineFeel() {
+		gActor.setTouched(self);
+		inherited();
+	}
 ;

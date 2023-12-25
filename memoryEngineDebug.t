@@ -103,19 +103,28 @@ modify MemoryEngine
 
 modify Memory
 	_output(str, prefix?) { "\n<<(prefix ? prefix : '')>><<str>>\n "; }
+	_outputProp(prop, prefix?) {
+		local v;
+
+		v = (self).(prop);
+		if((v == nil) || (v == 0)) return;
+
+		_output('<<toString(prop)>> = <<toString(v)>>', prefix);
+	}
+_foozle = 'foo'
 	_debugMemory(prefix?) {
-		_output(' <.p> ', prefix);
-		_output('described = <<toString(described)>>', prefix);
-		_output('known = <<toString(known)>>', prefix);
-		_output('revealed = <<toString(revealed)>>', prefix);
-		_output('seen = <<toString(seen)>>', prefix);
+		_output(' <.p> ');
+		_outputProp(&described, prefix);
+		_outputProp(&known, prefix);
+		_outputProp(&revealed, prefix);
+		_outputProp(&seen, prefix);
 #ifndef MEMORY_ENGINE_NO_SENSES
-		_output('heard = <<toString(heard)>>', prefix);
-		_output('smelled = <<toString(smelled)>>', prefix);
-		_output('touched = <<toString(touched)>>', prefix);
-		_output('tasted = <<toString(tasted)>>', prefix);
+		_outputProp(&heard, prefix);
+		_outputProp(&smelled, prefix);
+		_outputProp(&touched, prefix);
+		_outputProp(&tasted, prefix);
 #endif // MEMORY_ENGINE_NO_SENSES
-		_output(' <.p> ', prefix);
+		_output(' <.p> ');
 	}
 ;
 
@@ -124,14 +133,13 @@ modify Memory
 	_debugMemory(prefix?) {
 		inherited(prefix);
 
-		_output('createTime = <<toString(createTime)>>', prefix);
-		_output('writeTime = <<toString(writeTime)>>', prefix);
-		_output('writeCount = <<toString(writeCount)>>', prefix);
-		_output('readTime = <<toString(readTime)>>', prefix);
-		_output('readCount = <<toString(readCount)>>', prefix);
-		_output('age = <<toString(age())>>', prefix);
-		_output('<.p>', prefix);
-		_output('room = <<(room ? room.roomName : 'nowhere')>>', prefix);
+		_outputProp(&createTime, prefix);
+		_outputProp(&writeTime, prefix);
+		_outputProp(&writeCount, prefix);
+		_outputProp(&readTime, prefix);
+		_outputProp(&readCount, prefix);
+		_outputProp(&age, prefix);
+		_output('<.p>');
 	}
 ;
 #endif // MEMORY_ENGINE_SIMPLE

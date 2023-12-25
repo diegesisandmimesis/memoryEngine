@@ -8,3 +8,4 @@
 -lib syslog/syslog
 -lib ../memoryEngine
 -source src/sample.t
+-source reflect.t
