@@ -8,9 +8,7 @@
 #include "memoryEngine.h"
 
 modify Thing
-	noteSeenBy(actor, prop) {
-		actor.setSeen(self);
-	}
+	noteSeenBy(actor, prop) { actor.setSeen(self); }
 	basicExamine() {
 		local r;
 

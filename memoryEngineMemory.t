@@ -25,7 +25,13 @@ class Memory: MemoryEngineObject
 	seen = nil		// has the object been seen
 
 	// Properties only used for static memory declarations.
-	obj = nil		// object the memory is of
+	memoryOf = nil		// object the memory is of
+
+	// Flag for whether this memory is directly accessible.
+	// This is true for most "normal" memories and nil for
+	// "synthetic" memories (things the actor doesn't actually
+	// know, but are used for tracking game state stuff).
+	_isListed = true
 
 	// Stub methods for stuff that isn't tracked in the base
 	// memory model.  This is just to make fallback more graceful if
@@ -132,6 +138,9 @@ class Memory: MemoryEngineObject
 	// More stub methods for stuff we don't track in the base class.
 	lastSeenLocation() { return(nil); }
 	lastSeenTurn() { return(0); }
+
+	// True for "normal" memories.
+	isListed() { return(_isListed == true); }
 ;
 
 #ifndef MEMORY_ENGINE_SIMPLE

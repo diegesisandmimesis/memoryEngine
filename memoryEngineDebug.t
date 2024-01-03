@@ -38,6 +38,25 @@ VerbRule(DebugMemoryActorObject) 'ma' singleDobj singleIobj:
 	verbPhrase = 'memory debug/debugging (whom) (about what)'
 ;
 
+DefineTActionSub(DebugMemoryActorRooms, MemoryTAction);
+VerbRule(DebugMemoryActorRooms) 'ma' singleDobj ('room'|'rooms'):
+	DebugMemoryActorRoomsAction
+	verbPhrase = 'memory debug/debugging (who)'
+;
+
+DefineTActionSub(DebugMemoryActorActors, MemoryTAction);
+VerbRule(DebugMemoryActorActors) 'ma' singleDobj ('actor'|'actors'):
+	DebugMemoryActorActorsAction
+	verbPhrase = 'memory debug/debugging (who)'
+;
+
+DefineTActionSub(DebugMemoryActorObjects, MemoryTAction);
+VerbRule(DebugMemoryActorObjects) 'ma' singleDobj ('object'|'objects'):
+	DebugMemoryActorObjectsAction
+	verbPhrase = 'memory debug/debugging (who)'
+;
+
+
 modify Thing
 	dobjFor(DebugMemoryObject) { action() { gActor._debugMemory(self); } }
 	dobjFor(DebugMemoryActor) {
@@ -62,11 +81,33 @@ modify Actor
 		}
 		action() { _debugMemory(gIobj); }
 	}
+	dobjFor(DebugMemoryActorRooms) {
+		verify() {
+			if(memoryEngine == nil)
+				illogical(&cantDebugNoMemoryEngine);
+		}
+		action() { _debugActorMemoryClass(Room); }
+	}
+	dobjFor(DebugMemoryActorActors) {
+		verify() {
+			if(memoryEngine == nil)
+				illogical(&cantDebugNoMemoryEngine);
+		}
+		action() { _debugActorMemoryClass(Actor); }
+	}
+	dobjFor(DebugMemoryActorObjects) {
+		verify() {
+			if(memoryEngine == nil)
+				illogical(&cantDebugNoMemoryEngine);
+		}
+		action() { _debugActorMemoryClass(Thing, [ Room, Actor ]); }
+	}
 ;
 
 modify Actor
-	_debugActorMemory() {
-		memoryEngine._debugMemories();
+	_debugActorMemory() { memoryEngine._debugMemories(); }
+	_debugActorMemoryClass(cls, excl?) {
+		memoryEngine._debugMemoryClass(cls, excl);
 	}
 	_debugMemory(id) {
 		local m;
@@ -92,8 +133,37 @@ modify MemoryEngine
 			return;
 		}
 		_memory.forEachAssoc(function(k, v) {
-			if(k.hideFromAll(LookAction))
+			if(isListed(k) != true)
 				return;
+			"\nobject:  <<k.name>>\n ";
+			v._debugMemory('\t');
+			"\n<.p> ";
+		});
+	}
+	_check(obj, lst) {
+		local i;
+
+		if((obj == nil) || (lst == nil)) return(nil);
+		if(lst.ofKind(Collection)) {
+			for(i = 1; i <= lst.length; i++) {
+				if(obj.ofKind(lst[i])) return(true);
+			}
+			return(nil);
+		} else {
+			return(obj.ofKind(lst));
+		}
+	}
+	_debugMemoryClass(cls, excl?) {
+		"\n<.p> ";
+		if(_memory == nil) {
+			reportFailure(&cantDebugNoActorMemories);
+			return;
+		}
+		_memory.forEachAssoc(function(k, v) {
+			if(isListed(k) != true)
+				return;
+			if(!_check(k, cls)) return;
+			if(excl && _check(k, excl)) return;
 			"\nobject:  <<k.name>>\n ";
 			v._debugMemory('\t');
 			"\n<.p> ";
@@ -111,7 +181,6 @@ modify Memory
 
 		_output('<<toString(prop)>> = <<toString(v)>>', prefix);
 	}
-_foozle = 'foo'
 	_debugMemory(prefix?) {
 		_output(' <.p> ');
 		_outputProp(&described, prefix);
@@ -129,6 +198,7 @@ _foozle = 'foo'
 ;
 
 #ifndef MEMORY_ENGINE_SIMPLE
+
 modify Memory
 	_debugMemory(prefix?) {
 		inherited(prefix);
@@ -142,6 +212,7 @@ modify Memory
 		_output('<.p>');
 	}
 ;
+
 #endif // MEMORY_ENGINE_SIMPLE
 
 #endif // __DEBUG_MEMORY_ENGINE

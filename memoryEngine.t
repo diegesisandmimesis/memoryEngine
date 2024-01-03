@@ -197,8 +197,9 @@ class MemoryEngine: MemoryEngineObject
 	// to be true.  Used for direct sense properties; seeing something
 	// automatically makes it known.
 	_setSenseProp(id, prop, val?) {
-		if(_setProp(id, prop, val) != true)
+		if(_setProp(id, prop, val) != true) {
 			return(nil);
+		}
 		return(setKnown(id));
 	}
 		
@@ -244,5 +245,15 @@ class MemoryEngine: MemoryEngineObject
 		if((location == nil) || !location.ofKind(Actor))
 			return;
 		location.setMemoryEngine(self);
+	}
+
+	isListed(id) {
+		local m;
+
+		if(id == nil) return(nil);
+		if((m = _memory[id]) == nil) return(nil);
+		if(m.isListed() != true) return(nil);
+		if(id.ofKind(RoomPart)) return(nil);
+		return(true);
 	}
 ;

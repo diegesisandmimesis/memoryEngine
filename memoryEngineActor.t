@@ -10,9 +10,11 @@
 // Modifications for the Actor class.
 // By default all actors get their own memory engine.
 modify Actor
-	memoryEngine = nil
-
+	// By default, Actors use memory engines.
 	useMemoryEngine = true
+
+	// Property to hold the MemoryEngine instance.
+	memoryEngine = nil
 
 	// Replacements for the stock adv3 "knows" methods.
 	knowsAbout(obj) {
