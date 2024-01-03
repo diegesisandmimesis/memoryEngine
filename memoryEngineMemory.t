@@ -193,26 +193,30 @@ modify Memory
 	// We also update the write time and count.
 	updateProp(prop, val) {
 		inherited(prop, val);
-		updateWriteTime();
 		updateWriteCount();
 	}
 
 	// Update the turn number and count of the memory.
 	updateWriteTime() { writeTime = libGlobal.totalTurns; }
-	updateWriteCount() { writeCount += 1; }
+	updateWriteCount() {
+		if(writeTime == libGlobal.totalTurns) return;
+		writeCount += 1;
+		updateWriteTime();
+	}
 	updateReadTime() { readTime = libGlobal.totalTurns; }
-	updateReadCount() { readCount += 1; }
+	updateReadCount() {
+		if(readTime == libGlobal.totalTurns) return;
+		readCount += 1;
+		updateReadTime();
+	}
 
 	// Update a memory using another Memory as the argument.
 	updateMemory(data?) {
-		updateWriteTime();
-		updateWriteCount();
 		return(inherited(data));
 	}
 
 	// Update the location of the memory.
 	updateLocation(loc?) {
-		updateWriteTime();
 		updateWriteCount();
 		room = loc;
 		return(true);
