@@ -13,6 +13,9 @@ modify Actor
 	// By default, Actors use memory engines.
 	useMemoryEngine = true
 
+	// Should the actor automatically observe their surroundings?
+	// By default they don't.  The Alert mixin provides the mechanism
+	// to make this happen.
 	alert = nil
 
 	// Property to hold the MemoryEngine instance.
@@ -93,16 +96,28 @@ modify Actor
 	}
 ;
 
+// Class for actors that should automatically observe their surroundings.
+// We just provide an executeActorTurn() replacement that 
 class Alert: Actor
 	alert = true
 	executeActorTurn() {
+		// Turn off output
 		actorSenseFilter.activate();
+
+		// Look around.  In addition to sight, this automagically
+		// takes care of detection of ambient sounds and smells.
 		self.lookAround(nil);
+
+		// Turn the output back on.
 		actorSenseFilter.deactivate();
+
+		// Do whatever else the actor should do.
 		inherited();
 	}
 ;
 
+// Filter to turn off output.
+// Enabling the filter disables all output, disabling turns it back on.
 actorSenseFilter: OutputFilter, PreinitObject
 	isActive = nil
 	activate() { gTranscript.deactivate(); isActive = true; }
