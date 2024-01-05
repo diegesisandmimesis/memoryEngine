@@ -25,7 +25,7 @@ class Memory: MemoryEngineObject
 	seen = nil		// has the object been seen
 
 	// Properties only used for static memory declarations.
-	memoryOf = nil		// object the memory is of
+	_obj = nil		// object the memory is of
 
 	// Flag for whether this memory is directly accessible.
 	// This is true for most "normal" memories and nil for

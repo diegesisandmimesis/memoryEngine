@@ -56,12 +56,35 @@ middleRoom: Room 'Middle Room'
 	north = northRoom
 	south = startRoom
 ;
-+alice: Person 'alice' 'Alice'
++alice: Person, Alert 'alice' 'Alice'
 	"She looks like the first person you'd turn to in a problem. "
 	isHer = true
 	isProperName = true
+/*
+	executeActorTurn() {
+		aliceFilter.activate();
+		self.lookAround(nil);
+		aliceFilter.deactivate();
+		inherited();
+	}
+*/
 ;
-++Memory ->pebble ->nil ->nil ->true;
+++Memory ->pebble seen = true;
+
+/*
+aliceFilter: OutputFilter
+	isActive = nil
+	activate() { gTranscript.deactivate(); isActive = true; }
+	deactivate() { gTranscript.activate(); isActive = nil; }
+	filterText(str, val) { return(isActive ? '' : inherited(str, val)); }
+;
+
+PreinitObject
+	execute() {
+		mainOutputStream.addOutputFilter(aliceFilter);
+	}
+;
+*/
 
 northRoom: Room 'North Room'
 	"This is the north room.  There's another room to the south. "

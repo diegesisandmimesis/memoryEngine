@@ -15,7 +15,6 @@
 //	(knowsAbout(), hasSeen(), and so on), the module adds several
 //	methods to Actor:
 //
-//
 //		canSense(obj)
 //			boolean true if the actor can detect the given object
 //			via any sense
@@ -25,7 +24,7 @@
 //			given object via any sense
 //
 //		getMemory(obj)
-//			returns the actor's Memory instace for the given object
+//			returns the actor's Memory instance for the given object
 //
 //
 //	In addition, there getters and setters for each Memory property:
@@ -89,18 +88,10 @@
 //			isHer = true
 //			isProperName = true
 //		;
-//		+Memory ->pebble ->true;
+//		+Memory ->pebble known = true;
 //
 //	In this example the NPC alice will start the game knowing about
 //	the pebble object.
-//
-//	The template is:
-//
-//		Memory ->obj ->known? ->revealed? ->seen? ->described?
-//
-//	Where obj is the object the memory is of, and the remaining arguments
-//	are the named memory flags.
-//
 //
 //
 // COMPILER FLAGS
@@ -117,6 +108,38 @@
 //		tracked (replicating the stock adv3 behavior).  By default
 //		the module will keep track of all five senses.
 //
+//
+// DEBUGGING COMMANDS
+//
+//	When compiled with -D __DEBUG_MEMORY_ENGINE, the module provides
+//	the following debugging commands:
+//
+//		>MA [actor]
+//			Shows a summary of each of the actor's memories
+//
+//		>MA [actor] actor
+//			Shows a summary of each of the actor's memories
+//			about other actors
+//
+//		>MA [actor] object
+//			Shows a summary of each of the actor's memories
+//			about objects
+//
+//		>MA [actor] room
+//			Shows a summary of each of the actor's memories
+//			about rooms
+//
+//		>MA [actor] [object]
+//			Shows a summary of the actor's memories of the
+//			given object
+//
+//		>MO [object]
+//			Shows a summary of the player's memories of the
+//			given object
+//
+//		>ME
+//			Displays information about the total number of
+//			memory engines and memories currently in the game
 //
 #include <adv3.h>
 #include <en_us.h>
@@ -155,20 +178,48 @@ class MemoryEngine: MemoryEngineObject
 
 	_memory = nil
 
+	_initMemoryTable() { self._memory = new LookupTable(); }
+
 	_getMemory(id) {
 		return(active ? (self._memory ? self._memory[id] : nil) : nil);
 	}
 
-	_setMemory(id, data) {
+	_createMemory(id) {
 		if(active != true) return(nil);
-		if(self._memory == nil) self._memory = new LookupTable();
-		if(self._memory[id] == nil) {
-			if(data != nil) {
-				self._memory[id] = data.clone();
-				return(true);
-			}
-			self._memory[id] = new Memory();
+		if(self._memory == nil) _initMemoryTable();
+		self._memory[id] = new Memory();
+		return(self._memory[id]);
+	}
+
+	_setMemory(id, data) {
+		local m;
+
+		if(id == nil) return(nil);
+		if(data == nil) {
+			_memory[id] = nil;
+			return(true);
 		}
+		if(data.ofKind(Memory)) {
+			_memory[id] = data;
+			return(true);
+		}
+		m = _createMemory(id);
+		data.getPropList().forEach(function(o) {
+			if(!data.propDefined(o, PropDefDirectly))
+				return;
+			m.(o) = data.(o);
+		});
+		return(true);
+	}
+
+	setMemory(id, data) {
+		if(active != true) return(nil);
+		if(self._memory == nil) _initMemoryTable();
+		if(self._memory[id] == nil) {
+			if(data != nil) return(_setMemory(id, data));
+			_createMemory(id);
+		}
+		if(data == nil) return(true);
 		return(self._memory[id].update(data));
 	}
 
@@ -184,7 +235,7 @@ class MemoryEngine: MemoryEngineObject
 
 		if(active != true) return(nil);
 		if((m = _getMemory(id)) == nil) {
-			_setMemory(id, nil);
+			setMemory(id, nil);
 			if((m = _getMemory(id)) == nil)
 				return(nil);
 		}
@@ -230,10 +281,10 @@ class MemoryEngine: MemoryEngineObject
 	addMemory(obj) {
 		if((obj == nil) || !obj.ofKind(Memory))
 			return(nil);
-		if(obj.obj == nil)
+		if(obj._obj == nil)
 			return(nil);
 
-		return(_setMemory(obj.obj, obj));
+		return(setMemory(obj._obj, obj));
 	}
 
 	getMemory(id) { return(_getMemory(id)); }

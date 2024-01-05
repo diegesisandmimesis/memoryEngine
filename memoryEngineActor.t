@@ -13,6 +13,8 @@ modify Actor
 	// By default, Actors use memory engines.
 	useMemoryEngine = true
 
+	alert = nil
+
 	// Property to hold the MemoryEngine instance.
 	memoryEngine = nil
 
@@ -88,5 +90,25 @@ modify Actor
 			return;
 
 		setMemoryEngine(new MemoryEngine());
+	}
+;
+
+class Alert: Actor
+	alert = true
+	executeActorTurn() {
+		actorSenseFilter.activate();
+		self.lookAround(nil);
+		actorSenseFilter.deactivate();
+		inherited();
+	}
+;
+
+actorSenseFilter: OutputFilter, PreinitObject
+	isActive = nil
+	activate() { gTranscript.deactivate(); isActive = true; }
+	deactivate() { gTranscript.activate(); isActive = nil; }
+	filterText(str, val) { return(isActive ? '' : inherited(str, val)); }
+	execute() {
+		mainOutputStream.addOutputFilter(self);
 	}
 ;

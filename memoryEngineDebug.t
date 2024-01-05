@@ -5,6 +5,9 @@
 //	Implements a few debugging actions.
 //
 //	>MA [actor]		shows all the memories for the given actor
+//	>MA [actor] actor	shows actor's memories about other actors
+//	>MA [actor] object	shows actor's memories about objects
+//	>MA [actor] room	shows actor's memories about rooms
 //	>MA [actor] [object]	shows the actor's memory for the object
 //	>MO [object]		shows the player's memory for the object
 //
@@ -21,6 +24,30 @@ class MemoryAction: Action
 ;
 class MemoryTAction: MemoryAction, TAction;
 class MemoryTIAction: MemoryAction, TIAction;
+
+DefineSystemAction(DebugMemoryEngine)
+	execSystemAction() {
+		local m0, m1, n;
+
+		n = 0;
+		m0 = 0;
+		m1 = 0;
+		forEachInstance(MemoryEngine, function(o) {
+			n += 1;
+			if(o._memory == nil) return;
+			o._memory.forEachAssoc(function(k, v) {
+				m0 += 1;
+				if(o.isListed(k)) m1 += 1;
+			});
+		});
+		"\nMemory engines = <<toString(n)>>\n ";
+		"\nTotal memories = <<toString(m0)>>\n ";
+		"\nListed memories = <<toString(m1)>>\n ";
+	}
+;
+VerbRule(DebugMemoryEngine) 'me': DebugMemoryEngineAction
+	verbPhrase = 'memory engine debug/debugging'
+;
 
 DefineTActionSub(DebugMemoryObject, MemoryTAction);
 VerbRule(DebugMemoryObject) 'mo' singleDobj: DebugMemoryObjectAction
@@ -127,7 +154,6 @@ modify Actor
 
 modify MemoryEngine
 	_debugMemories() {
-		"\n<.p> ";
 		if(_memory == nil) {
 			reportFailure(&cantDebugNoActorMemories);
 			return;
@@ -135,9 +161,9 @@ modify MemoryEngine
 		_memory.forEachAssoc(function(k, v) {
 			if(isListed(k) != true)
 				return;
+			"\n<.p> ";
 			"\nobject:  <<k.name>>\n ";
 			v._debugMemory('\t');
-			"\n<.p> ";
 		});
 	}
 	_check(obj, lst) {
@@ -154,19 +180,19 @@ modify MemoryEngine
 		}
 	}
 	_debugMemoryClass(cls, excl?) {
-		"\n<.p> ";
 		if(_memory == nil) {
 			reportFailure(&cantDebugNoActorMemories);
 			return;
 		}
+		"\n<.p> ";
 		_memory.forEachAssoc(function(k, v) {
 			if(isListed(k) != true)
 				return;
 			if(!_check(k, cls)) return;
 			if(excl && _check(k, excl)) return;
+			"\n<.p> ";
 			"\nobject:  <<k.name>>\n ";
 			v._debugMemory('\t');
-			"\n<.p> ";
 		});
 	}
 ;
@@ -182,7 +208,6 @@ modify Memory
 		_output('<<toString(prop)>> = <<toString(v)>>', prefix);
 	}
 	_debugMemory(prefix?) {
-		_output(' <.p> ');
 		_outputProp(&described, prefix);
 		_outputProp(&known, prefix);
 		_outputProp(&revealed, prefix);
@@ -193,7 +218,6 @@ modify Memory
 		_outputProp(&touched, prefix);
 		_outputProp(&tasted, prefix);
 #endif // MEMORY_ENGINE_NO_SENSES
-		_output(' <.p> ');
 	}
 ;
 
@@ -209,7 +233,6 @@ modify Memory
 		_outputProp(&readTime, prefix);
 		_outputProp(&readCount, prefix);
 		_outputProp(&age, prefix);
-		_output('<.p>');
 	}
 ;
 
