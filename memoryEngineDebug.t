@@ -233,6 +233,9 @@ modify Memory
 		_outputProp(&readTime, prefix);
 		_outputProp(&readCount, prefix);
 		_outputProp(&age, prefix);
+
+		if(room != nil)
+			_output('room = <<room.roomName>>', prefix);
 	}
 ;
 

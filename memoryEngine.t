@@ -53,7 +53,7 @@
 //			the actor has seen the object
 //
 //
-//	If the module is NOT compiled with -D SIMPLE_MEMORY_NO_SENSES then
+//	If the module is NOT compiled with -D MEMORY_ENGINE_NO_SENSES then
 //	the following methods will also be available:
 //
 //		getHeard(obj)
@@ -76,6 +76,22 @@
 //			Get or set the "touched" property, indicating that
 //			the actor has touched the object
 //
+//
+// NPC MEMORIES
+//
+//	By default NPCs don't look around/sense their environments.  If
+//	you want an NPC to automagically sense their surroundings via the
+//	same mechanism the player does (Actor.lookAround()) just add
+//	Alert to the NPC's superclass list:
+//
+//		+alice: Person, Alert 'alice' 'Alice'
+//			"She looks like the first person you'd turn to
+//			in a problem. "
+//
+//			isHer = true
+//			isProperName = true
+//		;
+//	
 //
 // DECLARING MEMORIES IN SOURCE
 //
