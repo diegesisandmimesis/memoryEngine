@@ -13,6 +13,9 @@ modify Actor
 	// By default, Actors use memory engines.
 	useMemoryEngine = true
 
+	// Class to use for the actor's memory engine.
+	memoryEngineClass = MemoryEngine
+
 	// Should the actor automatically observe their surroundings?
 	// By default they don't.  The Alert mixin provides the mechanism
 	// to make this happen.
@@ -54,8 +57,8 @@ modify Actor
 	getKnown(obj) { return(_getMemoryProp(&getKnown, obj)); }
 	setKnown(obj) { return(_getMemoryProp(&setKnown, obj)); }
 
-	getRevealed(obj) { return(_getMemoryProp(&getKnown, obj)); }
-	setRevealed(obj) { return(_getMemoryProp(&setKnown, obj)); }
+	getRevealed(obj) { return(_getMemoryProp(&getRevealed, obj)); }
+	setRevealed(obj) { return(_getMemoryProp(&setRevealed, obj)); }
 
 	getSeen(obj) { return(_getMemoryProp(&getSeen, obj)); }
 	setSeen(obj) {
@@ -76,7 +79,7 @@ modify Actor
 	// from MemoryEngine.initializeMemoryEngine() (if the engine
 	// is explicitly declared in the source).
 	setMemoryEngine(obj) {
-		if((obj == nil) || !obj.ofKind(MemoryEngine))
+		if((obj == nil) || !obj.ofKind(memoryEngineClass))
 			return(nil);
 
 		memoryEngine = obj;
@@ -92,7 +95,7 @@ modify Actor
 		if((memoryEngine != nil) || (useMemoryEngine != true))
 			return;
 
-		setMemoryEngine(new MemoryEngine());
+		setMemoryEngine(memoryEngineClass.createInstance());
 	}
 ;
 
@@ -102,28 +105,20 @@ class Alert: Actor
 	alert = true
 	executeActorTurn() {
 		// Turn off output
-		actorSenseFilter.activate();
+		gOutputOff;
 
 		// Look around.  In addition to sight, this automagically
 		// takes care of detection of ambient sounds and smells.
 		self.lookAround(nil);
 
 		// Turn the output back on.
-		actorSenseFilter.deactivate();
+		gOutputOn;
 
 		// Do whatever else the actor should do.
 		inherited();
 	}
 ;
 
-// Filter to turn off output.
-// Enabling the filter disables all output, disabling turns it back on.
-actorSenseFilter: OutputFilter, PreinitObject
-	isActive = nil
-	activate() { gTranscript.deactivate(); isActive = true; }
-	deactivate() { gTranscript.activate(); isActive = nil; }
-	filterText(str, val) { return(isActive ? '' : inherited(str, val)); }
-	execute() {
-		mainOutputStream.addOutputFilter(self);
-	}
+modify conversationManager
+	setRevealed(id) { inherited(id); gActor.setRevealed(id); }
 ;

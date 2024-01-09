@@ -182,24 +182,19 @@ class MemoryEngine: MemoryEngineObject
 	// Actor we belong to.
 	actor = nil
 
-	// These will contain LookupTables, created on first write.
-	// We keep the data type separate (instead of basically making a
-	// single big database with a row indicating the record type) to
-	// make single-type lookups and updates faster.  The asumption being
-	// that all the native lookups and updates (e.g. updating the "seen"
-	// data every turn) will dominate the usage.
-	//_seenData = nil
-	//_knownData = nil
-	//_revealedData = nil
-
+	// LookupTable for memories.  Keys are IDs or objects, values are
+	// Memory instances.
 	_memory = nil
 
+	// Create the memory table.
 	_initMemoryTable() { self._memory = new LookupTable(); }
 
+	// Return the requested memory.
 	_getMemory(id) {
 		return(active ? (self._memory ? self._memory[id] : nil) : nil);
 	}
 
+	// Create a new, "empty" memory for the given ID.
 	_createMemory(id) {
 		if(active != true) return(nil);
 		if(self._memory == nil) _initMemoryTable();
@@ -207,38 +202,82 @@ class MemoryEngine: MemoryEngineObject
 		return(self._memory[id]);
 	}
 
+	// Set the memory for the given ID.  If the second arg is a
+	// Memory instance, it will be used directly.  If it is nil,
+	// the memory will be set to nil.  Otherwise, any properties
+	// directly defined on the object will be copied onto the memory.
+	// This method (with the leading underscore) is the "raw"
+	// memory set method.  It doesn't do checks to see if the memory
+	// is allowed to be set (i.e. it doesn't check if the memory engine
+	// is active).
 	_setMemory(id, data) {
 		local m;
 
-		if(id == nil) return(nil);
+		// Make sure we have an ID.
+		if(id == nil)
+			return(nil);
+
+		// If the second arg is nil, clear the memory.
 		if(data == nil) {
 			_memory[id] = nil;
 			return(true);
 		}
+
+		// If the second arg is a memory, use it.
 		if(data.ofKind(Memory)) {
 			_memory[id] = data;
 			return(true);
 		}
+
+		// Create a new, empty memory.
 		m = _createMemory(id);
+
+		// Go through all the properties directly defined on the
+		// second arg and add them to the new memory.
 		data.getPropList().forEach(function(o) {
 			if(!data.propDefined(o, PropDefDirectly))
 				return;
 			m.(o) = data.(o);
 		});
+
 		return(true);
 	}
 
+	// Set a memory.
+	// Unlike _setMemory() (above), this method applies checks.
+	// It also will update an existing memory instead of replacing it.
 	setMemory(id, data) {
-		if(active != true) return(nil);
-		if(self._memory == nil) _initMemoryTable();
+		// If we're not active, we don't do anything.
+		if(active != true)
+			return(nil);
+
+		// Init the memory table if necessary.
+		if(self._memory == nil)
+			_initMemoryTable();
+
+		// If the memory doesn't exist, create it.
 		if(self._memory[id] == nil) {
-			if(data != nil) return(_setMemory(id, data));
+			// If our second arg is non-nil we use it to
+			// create a new memory and return.
+			if(data != nil)
+				return(_setMemory(id, data));
+
+			// Create an empty memory and return (because
+			// we know our data is nil).
 			_createMemory(id);
+			return(true);
 		}
-		if(data == nil) return(true);
+
+		// If we're here, then we know our memory is non-nil.  If
+		// our data IS nil, then we have nothing to do.
+		if(data == nil)
+			return(true);
+
+		// Update the existing memory.
 		return(self._memory[id].update(data));
 	}
 
+	// Utility method to return the value of a property on a memory.
 	_getProp(id, prop) {
 		local m;
 
@@ -246,15 +285,19 @@ class MemoryEngine: MemoryEngineObject
 		return(m.(prop));
 	}
 
+	// Utility method to set the value of a property on a memory.
 	_setProp(id, prop, val?) {
 		local m;
 
-		if(active != true) return(nil);
+		if(active != true)
+			return(nil);
+
 		if((m = _getMemory(id)) == nil) {
 			setMemory(id, nil);
 			if((m = _getMemory(id)) == nil)
 				return(nil);
 		}
+
 		m.updateProp(prop, val);
 
 		return(true);
@@ -314,13 +357,30 @@ class MemoryEngine: MemoryEngineObject
 		location.setMemoryEngine(self);
 	}
 
+	// Returns boolean true if the given memory is a "listed" entity.
+	// This is mostly to exclude the memory of room parts and other
+	// "incidental" things like that.
 	isListed(id) {
 		local m;
 
-		if(id == nil) return(nil);
-		if((m = _memory[id]) == nil) return(nil);
-		if(m.isListed() != true) return(nil);
-		if(id.ofKind(RoomPart)) return(nil);
+		// Make sure we have an ID.
+		if(id == nil)
+			return(nil);
+
+		// If we don't have a memory, we're not listed.
+		if((m = _memory[id]) == nil)
+			return(nil);
+
+		// Check the memory, which can always preempt our
+		// decision.
+		if(m.isListed() != true)
+			return(nil);
+
+		// Room parts are always ignored by default.
+		if(id.ofKind(RoomPart))
+			return(nil);
+
+		// We're listed.
 		return(true);
 	}
 ;

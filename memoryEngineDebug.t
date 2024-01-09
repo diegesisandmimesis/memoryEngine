@@ -162,7 +162,11 @@ modify MemoryEngine
 			if(isListed(k) != true)
 				return;
 			"\n<.p> ";
-			"\nobject:  <<k.name>>\n ";
+			if(k.ofKind(String)) {
+				"\nobject:  <<k>>\n ";
+			} else {
+				"\nobject:  <<k.name>>\n ";
+			}
 			v._debugMemory('\t');
 		});
 	}
@@ -191,7 +195,10 @@ modify MemoryEngine
 			if(!_check(k, cls)) return;
 			if(excl && _check(k, excl)) return;
 			"\n<.p> ";
-			"\nobject:  <<k.name>>\n ";
+			if(k.ofKind(String))
+				"\nobject:  <<k>>\n ";
+			else
+				"\nobject:  <<k.name>>\n ";
 			v._debugMemory('\t');
 		});
 	}

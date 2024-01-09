@@ -6,6 +6,7 @@
 -lib system
 -lib adv3/adv3
 -lib syslog/syslog
+-lib outputToggle/outputToggle
 -lib ../memoryEngine
 -source src/sample.t
 -source reflect.t

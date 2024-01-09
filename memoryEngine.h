@@ -19,11 +19,20 @@
 #error "syslog should be in /home/user/tads/syslog ."
 #endif // SYSLOG_H
 
+#include "outputToggle.h"
+#ifndef OUTPUT_TOGGLE_H
+#error "This module requires the outputToggle module."
+#error "https://github.com/diegesisandmimesis/outputToggle"
+#error "It should be in the same parent directory as this module.  So if"
+#error "memoryEngine is in /home/user/tads/memoryEngine, then"
+#error "outputToggle should be in /home/user/tads/syslog ."
+#endif // OUTPUT_TOGGLE_H
+
 #undef gRevealed
 #define gRevealed(id) (memoryEngineManager.getRevealed(gActor, id))
 
 #undef gReveal
-#define gReveal(id) (memoryEngineManager.setRevealed(gActor, id))
+#define gReveal(id) (memoryEngineManager.gRevealReplacement(gActor, id))
 
 #define gKnowsAbout(id) (memoryEngineManager.getKnown(gActor, id))
 #define gLearnAbout(id) (memoryEngineManager.setKnown(gActor, id))

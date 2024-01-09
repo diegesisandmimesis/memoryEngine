@@ -41,10 +41,15 @@ versionInfo: GameID
 ;
 
 startRoom: Room 'Void'
-	"This is a featureless void.  There's another room to the north. "
+	"This is a featureless void with a sign on the wall.  There's another
+	room to the north. "
 	north = middleRoom
 ;
-+pebble: Thing 'small round pebble' 'pebble' "A small, round pebble. ";
++sign: Fixture 'sign' 'sign'
+	"<q>Reading this reveals the terrible secret of the sign.</q>
+	<.reveal signSecret> ";
+;
++pebble: Thing 'small round pebble' 'pebble' "A small, round pebble. <.reveal foozle>";
 +flower: Thing 'smelly flower' 'flower'
 	"A smelly flower. "
 	smellPresence = true

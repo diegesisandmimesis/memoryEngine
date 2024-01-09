@@ -31,6 +31,7 @@ memoryEngineManager: MemoryEngineObject
 	getKnown(actor, id) { return(_callMethod(actor, id, &getKnown)); }
 	setKnown(actor, id) { return(_callMethod(actor, id, &setKnown)); }
 
+	gRevealReplacement(actor, id) { setRevealed(actor, id); }
 	getRevealed(actor, id) { return(_callMethod(actor, id, &getRevealed)); }
 	setRevealed(actor, id) { return(_callMethod(actor, id, &setRevealed)); }
 
