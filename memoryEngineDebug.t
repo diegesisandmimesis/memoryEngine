@@ -37,6 +37,7 @@ DefineSystemAction(DebugMemoryEngine)
 			if(o._memory == nil) return;
 			o._memory.forEachAssoc(function(k, v) {
 				m0 += 1;
+				k = uid2obj(k);
 				if(o.isListed(k)) m1 += 1;
 			});
 		});
@@ -83,6 +84,20 @@ VerbRule(DebugMemoryActorObjects) 'ma' singleDobj ('object'|'objects'):
 	verbPhrase = 'memory debug/debugging (who)'
 ;
 
+DefineLiteralAction(DebugMemoryID)
+	execAction() {
+		local id;
+
+		if((id = getLiteral()) == nil) {
+			reportFailure('No ID given. ');
+			exit;
+		}
+		gActor._debugMemory(id);
+	}
+;
+VerbRule(DebugMemoryID) 'mid' singleLiteral: DebugMemoryIDAction
+	verbPhrase = 'memory debug/debugging (what)'
+;
 
 modify Thing
 	dobjFor(DebugMemoryObject) { action() { gActor._debugMemory(self); } }
@@ -136,29 +151,44 @@ modify Actor
 	_debugActorMemoryClass(cls, excl?) {
 		memoryEngine._debugMemoryClass(cls, excl);
 	}
-	_debugMemory(id) {
-		local m;
-
-		if((id == nil) || !id.ofKind(Thing)) {
-			reportFailure(&noMemoryBadArg);
-			return;
-		}
-		if((m = getMemory(id)) == nil) {
-			reportFailure(&noMemory, id);
-			return;
-		}
-
-		m._debugMemory();
-	}
+	_debugMemory(id) { memoryEngine._debugMemory(id); }
 ;
 
 modify MemoryEngine
+	_debugMemory(id) {
+		local m, obj;
+
+		if(_memory == nil) {
+			reportFailure(&cantDebugNoActorMemories);
+			exit;
+		}
+		if((id = canonicalizeID(id)) == nil) {
+			reportFailure(&noMemoryBadArg);
+			exit;
+		}
+
+		obj = uid2obj(id);
+
+		if((m = getMemory(id)) == nil) {
+			if(obj == nil)
+				reportFailure(&noMemoryID, id);
+			else
+				reportFailure(&noMemoryObj, obj);
+			exit;
+		}
+
+		if(obj != nil) {
+			"Memory for <<obj.name>>:\n<.p> ";
+		}
+		m._debugMemory();
+	}
 	_debugMemories() {
 		if(_memory == nil) {
 			reportFailure(&cantDebugNoActorMemories);
 			return;
 		}
 		_memory.forEachAssoc(function(k, v) {
+			k = uid2obj(k);
 			if(isListed(k) != true)
 				return;
 			"\n<.p> ";
@@ -190,6 +220,7 @@ modify MemoryEngine
 		}
 		"\n<.p> ";
 		_memory.forEachAssoc(function(k, v) {
+			k = uid2obj(k);
 			if(isListed(k) != true)
 				return;
 			if(!_check(k, cls)) return;

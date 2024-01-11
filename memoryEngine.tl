@@ -7,4 +7,5 @@ source: memoryEngineMemory.t
 source: memoryEngineSenses.t
 source: memoryEnginePreinit.t
 source: memoryEngineMsg.t
+source: memoryEngineDisambig.t
 source: memoryEngineDebug.t

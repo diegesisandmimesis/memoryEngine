@@ -191,12 +191,14 @@ class MemoryEngine: MemoryEngineObject
 
 	// Return the requested memory.
 	_getMemory(id) {
+		if((id = canonicalizeID(id)) == nil) return(nil);
 		return(active ? (self._memory ? self._memory[id] : nil) : nil);
 	}
 
 	// Create a new, "empty" memory for the given ID.
 	_createMemory(id) {
 		if(active != true) return(nil);
+		if((id = canonicalizeID(id)) == nil) return(nil);
 		if(self._memory == nil) _initMemoryTable();
 		self._memory[id] = new Memory();
 		return(self._memory[id]);
@@ -214,7 +216,8 @@ class MemoryEngine: MemoryEngineObject
 		local m;
 
 		// Make sure we have an ID.
-		if(id == nil)
+		//if(id == nil)
+		if((id = canonicalizeID(id)) == nil)
 			return(nil);
 
 		// If the second arg is nil, clear the memory.
@@ -255,8 +258,11 @@ class MemoryEngine: MemoryEngineObject
 		if(self._memory == nil)
 			_initMemoryTable();
 
+		if((id = canonicalizeID(id)) == nil)
+			return(nil);
+
 		// If the memory doesn't exist, create it.
-		if(self._memory[id] == nil) {
+		if(_getMemory(id) == nil) {
 			// If our second arg is non-nil we use it to
 			// create a new memory and return.
 			if(data != nil)
@@ -361,14 +367,14 @@ class MemoryEngine: MemoryEngineObject
 	// This is mostly to exclude the memory of room parts and other
 	// "incidental" things like that.
 	isListed(id) {
-		local m;
+		local m, obj;
 
 		// Make sure we have an ID.
-		if(id == nil)
+		if((id = canonicalizeID(id)) == nil)
 			return(nil);
 
 		// If we don't have a memory, we're not listed.
-		if((m = _memory[id]) == nil)
+		if((m = _getMemory(id)) == nil)
 			return(nil);
 
 		// Check the memory, which can always preempt our
@@ -376,8 +382,11 @@ class MemoryEngine: MemoryEngineObject
 		if(m.isListed() != true)
 			return(nil);
 
+		if((obj = uid2obj(id)) == nil)
+			return(nil);
+
 		// Room parts are always ignored by default.
-		if(id.ofKind(RoomPart))
+		if(obj.ofKind(RoomPart))
 			return(nil);
 
 		// We're listed.

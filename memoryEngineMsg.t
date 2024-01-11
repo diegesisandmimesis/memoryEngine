@@ -17,5 +17,7 @@ modify playerActionMessages
 		{you/her dobj}. '
 
 	noMemoryBadArg = 'Unknown object to bad object type. '
-	noMemory(obj) { return('No memory for object <q><<obj.name>></q>. '); }
+	noMemoryID(id) { return('No object with UID <q><<id>></q>. '); }
+	noMemoryObj(obj) { return('No memory for object
+		<q><<obj.name>></q>. '); }
 ;

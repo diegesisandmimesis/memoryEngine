@@ -28,6 +28,15 @@
 #error "outputToggle should be in /home/user/tads/syslog ."
 #endif // OUTPUT_TOGGLE_H
 
+#include "uniqueID.h"
+#ifndef UNIQUE_ID_H
+#error "This module requires the uniqueID module."
+#error "https://github.com/diegesisandmimesis/uniqueID"
+#error "It should be in the same parent directory as this module.  So if"
+#error "memoryEngine is in /home/user/tads/memoryEngine, then"
+#error "uniqueID should be in /home/user/tads/syslog ."
+#endif // UNIQUE_ID_H
+
 #undef gRevealed
 #define gRevealed(id) (memoryEngineManager.getRevealed(gActor, id))
 
