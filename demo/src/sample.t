@@ -49,7 +49,16 @@ startRoom: Room 'Void'
 	"<q>Reading this reveals the terrible secret of the sign.</q>
 	<.reveal signSecret> ";
 ;
-+pebble: Thing 'small round pebble' 'pebble' "A small, round pebble. <.reveal foozle>";
++pebble: Thing 'small round pebble' 'pebble'
+	"A small, round pebble. (Turn <<toString(gTurn)>>) <.reveal foozle>"
+	dobjFor(Examine) {
+		action() {
+			inherited();
+			//"\nFoo = <<toString(gTurn)>>\n ";
+			//gReveal('foozle');
+		}
+	}
+;
 +flower: Thing 'smelly flower' 'flower'
 	"A smelly flower. "
 	smellPresence = true

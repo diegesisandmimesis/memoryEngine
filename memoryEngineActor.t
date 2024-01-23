@@ -58,7 +58,7 @@ modify Actor
 	setKnown(obj) { return(_getMemoryProp(&setKnown, obj)); }
 
 	getRevealed(obj) { return(_getMemoryProp(&getRevealed, obj)); }
-	setRevealed(obj) { return(_getMemoryProp(&setRevealed, obj)); }
+	setRevealed(obj) { "\ngTurn = <<toString(gTurn)>>\n "; return(_getMemoryProp(&setRevealed, obj)); }
 
 	getSeen(obj) { return(_getMemoryProp(&getSeen, obj)); }
 	setSeen(obj) {
@@ -104,15 +104,17 @@ modify Actor
 class Alert: Actor
 	alert = true
 	executeActorTurn() {
+		local f;
+
 		// Turn off output
-		gOutputOff;
+		f = gOutputLock;
 
 		// Look around.  In addition to sight, this automagically
 		// takes care of detection of ambient sounds and smells.
 		self.lookAround(nil);
 
 		// Turn the output back on.
-		gOutputOn;
+		gOutputUnlock(f);
 
 		// Do whatever else the actor should do.
 		inherited();

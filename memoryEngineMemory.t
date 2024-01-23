@@ -170,8 +170,7 @@ modify Memory
 	}
 
 	// Number of turns since the memory was updated.
-	age() { return(libGlobal.totalTurns
-		- (self.createTime ? self.createTime : 0)); }
+	age() { return(gTurn - (self.createTime ? self.createTime : 0)); }
 
 	// Returns a text string of the age in turns.
 	ageInTurns() {
@@ -206,15 +205,15 @@ modify Memory
 	}
 
 	// Update the turn number and count of the memory.
-	updateWriteTime() { writeTime = libGlobal.totalTurns; }
+	updateWriteTime() { writeTime = gTurn; }
 	updateWriteCount() {
-		if(writeTime == libGlobal.totalTurns) return;
+		if(writeTime == gTurn) return;
 		writeCount += 1;
 		updateWriteTime();
 	}
-	updateReadTime() { readTime = libGlobal.totalTurns; }
+	updateReadTime() { readTime = gTurn; }
 	updateReadCount() {
-		if(readTime == libGlobal.totalTurns) return;
+		if(readTime == gTurn) return;
 		readCount += 1;
 		updateReadTime();
 	}
@@ -241,17 +240,17 @@ modify Memory
 
 		if(obj.room != nil) room = obj.room;
 		if(obj.createTime != nil) createTime = obj.createTime;
-		if(obj.writeTime != nil) createTime = obj.writeTime;
+		if(obj.writeTime != nil) writeTime = obj.writeTime;
 
 		if(createTime == nil)
-			createTime = libGlobal.totalTurns;
+			createTime = gTurn;
 
 		return(true);
 	}
 
 	// The constructor sets the memory's creation time.
 	construct() {
-		createTime = (libGlobal.totalTurns ? libGlobal.totalTurns : 0);
+		createTime = (gTurn ? gTurn : 0);
 	}
 
 	lastSeenLocation() { return(room); }

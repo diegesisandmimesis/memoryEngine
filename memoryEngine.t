@@ -393,3 +393,9 @@ class MemoryEngine: MemoryEngineObject
 		return(true);
 	}
 ;
+
+modify libGlobal
+	currentTurn() {
+		return(gAction ? (totalTurns + gAction.actionTime)
+		: totalTurns); }
+;
