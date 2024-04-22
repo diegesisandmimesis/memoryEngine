@@ -58,7 +58,7 @@ modify Actor
 	setKnown(obj) { return(_getMemoryProp(&setKnown, obj)); }
 
 	getRevealed(obj) { return(_getMemoryProp(&getRevealed, obj)); }
-	setRevealed(obj) { "\ngTurn = <<toString(gTurn)>>\n "; return(_getMemoryProp(&setRevealed, obj)); }
+	setRevealed(obj) { return(_getMemoryProp(&setRevealed, obj)); }
 
 	getSeen(obj) { return(_getMemoryProp(&getSeen, obj)); }
 	setSeen(obj) {
