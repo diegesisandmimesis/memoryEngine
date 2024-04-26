@@ -255,6 +255,7 @@ modify Memory
 
 	lastSeenLocation() { return(room); }
 	lastSeenTurn() { return(writeTime); }
+	lastSeenAge() { return(gTurn - lastSeenTurn()); }
 ;
 
 #endif // MEMORY_ENGINE_SIMPLE

@@ -63,6 +63,8 @@
 
 Memory template ->_obj;
 
+#ifndef gTurn
 #define gTurn (libGlobal.currentTurn())
+#endif // gTurn
 
 #define MEMORY_ENGINE_H
