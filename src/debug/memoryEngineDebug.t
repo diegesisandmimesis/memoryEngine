@@ -147,11 +147,21 @@ modify Actor
 ;
 
 modify Actor
-	_debugActorMemory() { memoryEngine._debugMemories(); }
+	_debugActorMemory() {
+		if(!ofKind(Alert))
+			extraReport(&warningNotAlert);
+		memoryEngine._debugMemories();
+	}
 	_debugActorMemoryClass(cls, excl?) {
+		if(!ofKind(Alert))
+			extraReport(&warningNotAlert);
 		memoryEngine._debugMemoryClass(cls, excl);
 	}
-	_debugMemory(id) { memoryEngine._debugMemory(id); }
+	_debugMemory(id) {
+		if(!ofKind(Alert))
+			extraReport(&warningNotAlert);
+		memoryEngine._debugMemory(id);
+	}
 ;
 
 modify MemoryEngine

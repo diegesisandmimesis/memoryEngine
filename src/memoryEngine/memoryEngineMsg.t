@@ -20,4 +20,6 @@ modify playerActionMessages
 	noMemoryID(id) { return('No object with UID <q><<id>></q>. '); }
 	noMemoryObj(obj) { return('No memory for object
 		<q><<obj.name>></q>. '); }
+
+	warningNotAlert = 'WARNING: actor is not Alert. '
 ;

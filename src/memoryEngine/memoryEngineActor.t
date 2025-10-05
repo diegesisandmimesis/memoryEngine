@@ -97,6 +97,10 @@ modify Actor
 
 		setMemoryEngine(memoryEngineClass.createInstance());
 	}
+
+	searchMemories(fn) {
+		return(memoryEngine ? memoryEngine.search(fn) : nil);
+	}
 ;
 
 // Class for actors that should automatically observe their surroundings.

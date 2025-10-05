@@ -352,6 +352,15 @@ class MemoryEngine: MemoryEngineObject
 		return(setMemory(obj._obj, obj));
 	}
 
+	removeMemory(obj) {
+		if((obj == nil) || !obj.ofKind(Memory))
+			return(nil);
+		if(obj._obj == nil)
+			return(nil);
+
+		return(setMemory(obj._obj, nil));
+	}
+
 	getMemory(id) { return(_getMemory(id)); }
 
 	// Called at preinit for instances explicitly declared in the
@@ -391,6 +400,21 @@ class MemoryEngine: MemoryEngineObject
 
 		// We're listed.
 		return(true);
+	}
+
+	search(fn) {
+		local r;
+
+		if(_memory == nil)
+			return(nil);
+
+		r = new Vector();
+		_memory.valsToList(function(x) {
+			if((fn)(x) == true)
+				r.append(x);
+		});
+
+		return(r.toList());
 	}
 ;
 

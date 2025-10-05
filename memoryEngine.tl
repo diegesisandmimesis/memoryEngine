@@ -1,11 +1,12 @@
 name: memoryEngine Library
 source: memoryEngine.t
-source: memoryEngineThing.t
-source: memoryEngineActor.t
-source: memoryEngineManager.t
-source: memoryEngineMemory.t
-source: memoryEngineSenses.t
-source: memoryEnginePreinit.t
-source: memoryEngineMsg.t
-source: memoryEngineDisambig.t
-source: memoryEngineDebug.t
+source: src/memoryEngine/memoryEngineThing.t
+source: src/memoryEngine/memoryEngineActor.t
+source: src/memoryEngine/memoryEngineManager.t
+source: src/memoryEngine/memoryEngineMemory.t
+source: src/memoryEngine/memoryEngineSenses.t
+source: src/memoryEngine/memoryEnginePreinit.t
+source: src/memoryEngine/memoryEngineMsg.t
+source: src/memoryEngine/memoryEngineDisambig.t
+source: src/extra/memoryOfLock.t
+source: src/debug/memoryEngineDebug.t
